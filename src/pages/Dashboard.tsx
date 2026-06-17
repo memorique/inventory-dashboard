@@ -64,7 +64,7 @@ export default function Dashboard() {
             Attention needed
           </h2>
           <Link
-            to="/inventory"
+            to="/dashboard/inventory"
             className="text-sm font-medium text-brand-700 hover:text-brand-800"
           >
             View all →

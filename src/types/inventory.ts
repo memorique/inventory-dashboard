@@ -1,5 +1,17 @@
 export type StockStatus = "in_stock" | "low_stock" | "out_of_stock";
 
+export type StockAction = "restock" | "sale" | "adjustment" | "add";
+
+export interface NewInventoryItem {
+  sku: string;
+  name: string;
+  category: string;
+  quantity: number;
+  reorderLevel: number;
+  unitPrice: number;
+  location: string;
+}
+
 export interface InventoryItem {
   id: string;
   sku: string;
@@ -17,4 +29,23 @@ export interface CategorySummary {
   name: string;
   itemCount: number;
   totalValue: number;
+}
+
+export interface ActivityEntry {
+  id: string;
+  itemId: string;
+  itemName: string;
+  sku: string;
+  previousQty: number;
+  newQty: number;
+  change: number;
+  action: StockAction;
+  userName: string;
+  timestamp: string;
+}
+
+export interface ReorderSuggestion {
+  item: InventoryItem;
+  suggestedQty: number;
+  restockCost: number;
 }

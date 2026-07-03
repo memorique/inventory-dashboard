@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
-import { FiSearch } from "react-icons/fi";
+import { Link } from "react-router";
+import { FiPlus, FiSearch } from "react-icons/fi";
 import InventoryTable from "../components/InventoryTable";
-import { inventoryItems } from "../data/dummyInventory";
+import { useInventory } from "../context/InventoryContext";
 import type { StockStatus } from "../types/inventory";
 
 const statusFilters: { value: StockStatus | "all"; label: string }[] = [
@@ -12,18 +13,19 @@ const statusFilters: { value: StockStatus | "all"; label: string }[] = [
 ];
 
 export default function InventoryList() {
+  const { items, adjustStock } = useInventory();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<StockStatus | "all">("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
 
   const categories = useMemo(
-    () => ["all", ...new Set(inventoryItems.map((i) => i.category))],
-    []
+    () => ["all", ...new Set(items.map((i) => i.category))],
+    [items]
   );
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return inventoryItems.filter((item) => {
+    return items.filter((item) => {
       const matchesSearch =
         !q ||
         item.name.toLowerCase().includes(q) ||
@@ -35,15 +37,24 @@ export default function InventoryList() {
         categoryFilter === "all" || item.category === categoryFilter;
       return matchesSearch && matchesStatus && matchesCategory;
     });
-  }, [search, statusFilter, categoryFilter]);
+  }, [items, search, statusFilter, categoryFilter]);
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900">Inventory</h1>
-        <p className="text-sm text-slate-500 mt-1">
-          {filtered.length} of {inventoryItems.length} items
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">Inventory</h1>
+          <p className="text-sm text-slate-500 mt-1">
+            {filtered.length} of {items.length} items · use +/- to adjust stock
+          </p>
+        </div>
+        <Link
+          to="/dashboard/add-product"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-brand-600 text-white text-sm font-medium hover:bg-brand-700 transition-colors shrink-0"
+        >
+          <FiPlus size={16} />
+          Add product
+        </Link>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-3">
@@ -91,7 +102,11 @@ export default function InventoryList() {
         </div>
       </div>
 
-      <InventoryTable items={filtered} />
+      <InventoryTable
+        items={filtered}
+        adjustable
+        onAdjust={adjustStock}
+      />
     </div>
   );
 }

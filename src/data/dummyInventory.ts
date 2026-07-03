@@ -130,16 +130,3 @@ export const categories: CategorySummary[] = [
   { name: "Sports", itemCount: 2, totalValue: 3960.0 },
   { name: "Office", itemCount: 2, totalValue: 3412.7 },
 ];
-
-export function getInventoryStats(items: InventoryItem[]) {
-  const totalItems = items.length;
-  const totalUnits = items.reduce((sum, i) => sum + i.quantity, 0);
-  const totalValue = items.reduce(
-    (sum, i) => sum + i.quantity * i.unitPrice,
-    0
-  );
-  const lowStock = items.filter((i) => i.status === "low_stock").length;
-  const outOfStock = items.filter((i) => i.status === "out_of_stock").length;
-
-  return { totalItems, totalUnits, totalValue, lowStock, outOfStock };
-}

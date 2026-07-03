@@ -49,3 +49,23 @@ export interface ReorderSuggestion {
   suggestedQty: number;
   restockCost: number;
 }
+
+export interface StockPoint {
+  date: string;
+  quantity: number;
+}
+
+export type StockEventType =
+  | "restock"
+  | "reorder"
+  | "low_stock"
+  | "out_of_stock";
+
+export interface StockEvent {
+  id: string;
+  date: string;
+  type: StockEventType;
+  quantity: number;
+  delta?: number;
+  note: string;
+}

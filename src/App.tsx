@@ -10,6 +10,7 @@ import Categories from "./pages/Categories";
 import ActivityLog from "./pages/ActivityLog";
 import ReorderList from "./pages/ReorderList";
 import AddProduct from "./pages/AddProduct";
+import Analytics from "./pages/Analytics";
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
         <Route path="categories" element={<Categories />} />
         <Route path="activity" element={<ActivityLog />} />
         <Route path="reorders" element={<ReorderList />} />
+        <Route path="analytics" element={<Analytics />} />
         <Route path="add-product" element={<AddProduct />} />
       </Route>
     </Routes>

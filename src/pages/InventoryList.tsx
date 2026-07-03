@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import { FiSearch } from "react-icons/fi";
+import { Link } from "react-router";
+import { FiPlus, FiSearch } from "react-icons/fi";
 import InventoryTable from "../components/InventoryTable";
 import { useInventory } from "../context/InventoryContext";
 import type { StockStatus } from "../types/inventory";
@@ -40,11 +41,20 @@ export default function InventoryList() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900">Inventory</h1>
-        <p className="text-sm text-slate-500 mt-1">
-          {filtered.length} of {items.length} items · use +/- to adjust stock
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">Inventory</h1>
+          <p className="text-sm text-slate-500 mt-1">
+            {filtered.length} of {items.length} items · use +/- to adjust stock
+          </p>
+        </div>
+        <Link
+          to="/dashboard/add-product"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-brand-600 text-white text-sm font-medium hover:bg-brand-700 transition-colors shrink-0"
+        >
+          <FiPlus size={16} />
+          Add product
+        </Link>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-3">

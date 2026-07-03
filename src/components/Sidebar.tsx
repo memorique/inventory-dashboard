@@ -2,16 +2,20 @@ import { NavLink, useNavigate } from "react-router";
 import {
   FiActivity,
   FiBox,
+  FiPlusCircle,
   FiGrid,
   FiLayers,
   FiLogOut,
   FiPackage,
+  FiShoppingCart,
 } from "react-icons/fi";
 import { useAuth } from "../context/AuthContext";
 
 const navItems = [
   { to: "/dashboard", label: "Dashboard", icon: FiGrid, end: true },
   { to: "/dashboard/inventory", label: "Inventory", icon: FiPackage, end: false },
+  { to: "/dashboard/add-product", label: "Add product", icon: FiPlusCircle, end: false },
+  { to: "/dashboard/reorders", label: "Reorders", icon: FiShoppingCart, end: false },
   { to: "/dashboard/categories", label: "Categories", icon: FiLayers, end: false },
   { to: "/dashboard/activity", label: "Activity", icon: FiActivity, end: false },
 ];

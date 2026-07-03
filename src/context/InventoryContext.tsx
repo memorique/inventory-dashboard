@@ -11,6 +11,7 @@ import { inventoryItems as defaultItems } from "../data/dummyInventory";
 import type {
   ActivityEntry,
   InventoryItem,
+  NewInventoryItem,
   StockAction,
 } from "../types/inventory";
 import {
@@ -29,6 +30,7 @@ interface InventoryContextValue {
   stats: ReturnType<typeof getInventoryStats>;
   categories: ReturnType<typeof getCategorySummaries>;
   adjustStock: (itemId: string, change: number, action: StockAction) => void;
+  addItem: (item: NewInventoryItem) => string | null;
   resetInventory: () => void;
 }
 
@@ -107,6 +109,60 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
     [user?.name]
   );
 
+  const addItem = useCallback(
+    (input: NewInventoryItem): string | null => {
+      const sku = input.sku.trim().toUpperCase();
+      const name = input.name.trim();
+      const category = input.category.trim();
+
+      if (!sku || !name || !category || !input.location.trim()) {
+        return "Please fill in all required fields.";
+      }
+      if (input.quantity < 0 || input.reorderLevel < 0 || input.unitPrice < 0) {
+        return "Quantity, reorder level, and price cannot be negative.";
+      }
+
+      const duplicate = items.some(
+        (i) => i.sku.toUpperCase() === sku
+      );
+      if (duplicate) {
+        return "An item with this SKU already exists.";
+      }
+
+      const newItem = withComputedStatus({
+        id: crypto.randomUUID(),
+        sku,
+        name,
+        category,
+        quantity: input.quantity,
+        reorderLevel: input.reorderLevel,
+        unitPrice: input.unitPrice,
+        location: input.location.trim(),
+        status: "in_stock",
+        lastUpdated: new Date().toISOString().slice(0, 10),
+      });
+
+      setItems((prev) => [...prev, newItem]);
+
+      const entry: ActivityEntry = {
+        id: crypto.randomUUID(),
+        itemId: newItem.id,
+        itemName: newItem.name,
+        sku: newItem.sku,
+        previousQty: 0,
+        newQty: newItem.quantity,
+        change: newItem.quantity,
+        action: "add",
+        userName: user?.name ?? "Unknown",
+        timestamp: new Date().toISOString(),
+      };
+      setActivity((acts) => [entry, ...acts].slice(0, 100));
+
+      return null;
+    },
+    [items, user?.name]
+  );
+
   const resetInventory = useCallback(() => {
     const reset = defaultItems.map(withComputedStatus);
     setItems(reset);
@@ -119,8 +175,16 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
   const categories = useMemo(() => getCategorySummaries(items), [items]);
 
   const value = useMemo(
-    () => ({ items, activity, stats, categories, adjustStock, resetInventory }),
-    [items, activity, stats, categories, adjustStock, resetInventory]
+    () => ({
+      items,
+      activity,
+      stats,
+      categories,
+      adjustStock,
+      addItem,
+      resetInventory,
+    }),
+    [items, activity, stats, categories, adjustStock, addItem, resetInventory]
   );
 
   return (

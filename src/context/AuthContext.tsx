@@ -28,6 +28,12 @@ interface AuthContextValue {
 const USERS_KEY = "inventory-users";
 const SESSION_KEY = "inventory-session";
 
+export const DEMO_ACCOUNT = {
+  name: "Demo User",
+  email: "demo@inventory.com",
+  password: "demo123",
+} as const;
+
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 function loadUsers(): StoredUser[] {
@@ -36,6 +42,19 @@ function loadUsers(): StoredUser[] {
     return raw ? (JSON.parse(raw) as StoredUser[]) : [];
   } catch {
     return [];
+  }
+}
+
+function ensureDemoUser() {
+  const users = loadUsers();
+  const exists = users.some((u) => u.email === DEMO_ACCOUNT.email);
+  if (!exists) {
+    users.push({
+      name: DEMO_ACCOUNT.name,
+      email: DEMO_ACCOUNT.email,
+      password: DEMO_ACCOUNT.password,
+    });
+    saveUsers(users);
   }
 }
 
@@ -57,6 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    ensureDemoUser();
     setUser(loadSession());
     setIsLoading(false);
   }, []);

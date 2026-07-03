@@ -1,7 +1,7 @@
 import { FormEvent, useState } from "react";
 import { Link, Navigate, useLocation, useNavigate } from "react-router";
 import { FiBox } from "react-icons/fi";
-import { useAuth } from "../context/AuthContext";
+import { DEMO_ACCOUNT, useAuth } from "../context/AuthContext";
 
 export default function Login() {
   const { login, user } = useAuth();
@@ -22,6 +22,18 @@ export default function Login() {
     e.preventDefault();
     setError("");
     const err = login(email, password);
+    if (err) {
+      setError(err);
+      return;
+    }
+    navigate(from, { replace: true });
+  }
+
+  function handleDemoLogin() {
+    setError("");
+    setEmail(DEMO_ACCOUNT.email);
+    setPassword(DEMO_ACCOUNT.password);
+    const err = login(DEMO_ACCOUNT.email, DEMO_ACCOUNT.password);
     if (err) {
       setError(err);
       return;
@@ -50,6 +62,20 @@ export default function Login() {
             <p className="text-sm text-slate-500 mt-1">
               Log in to access your inventory dashboard.
             </p>
+
+            <div className="mt-6 p-4 rounded-lg bg-brand-50 border border-brand-100">
+              <p className="text-sm font-medium text-brand-800">Demo account</p>
+              <p className="text-xs text-brand-700/80 mt-1 font-mono">
+                {DEMO_ACCOUNT.email} / {DEMO_ACCOUNT.password}
+              </p>
+              <button
+                type="button"
+                onClick={handleDemoLogin}
+                className="mt-3 w-full py-2 rounded-lg border border-brand-200 bg-white text-sm font-medium text-brand-700 hover:bg-brand-100/50 transition-colors"
+              >
+                Log in as Demo User
+              </button>
+            </div>
 
             <form onSubmit={handleSubmit} className="mt-6 space-y-4">
               {error && (

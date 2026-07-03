@@ -8,6 +8,8 @@ import Dashboard from "./pages/Dashboard";
 import InventoryList from "./pages/InventoryList";
 import Categories from "./pages/Categories";
 import ActivityLog from "./pages/ActivityLog";
+import ReorderList from "./pages/ReorderList";
+import AddProduct from "./pages/AddProduct";
 
 function App() {
   return (
@@ -27,6 +29,8 @@ function App() {
         <Route path="inventory" element={<InventoryList />} />
         <Route path="categories" element={<Categories />} />
         <Route path="activity" element={<ActivityLog />} />
+        <Route path="reorders" element={<ReorderList />} />
+        <Route path="add-product" element={<AddProduct />} />
       </Route>
     </Routes>
   );

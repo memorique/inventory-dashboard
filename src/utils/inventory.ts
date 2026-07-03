@@ -1,6 +1,7 @@
 import type {
   CategorySummary,
   InventoryItem,
+  ReorderSuggestion,
   StockStatus,
 } from "../types/inventory";
 
@@ -53,4 +54,31 @@ export function getInventoryStats(items: InventoryItem[]) {
   const outOfStock = items.filter((i) => i.status === "out_of_stock").length;
 
   return { totalItems, totalUnits, totalValue, lowStock, outOfStock };
+}
+
+export function getSuggestedReorderQty(item: InventoryItem): number {
+  const target = item.reorderLevel * 2;
+  return Math.max(target - item.quantity, item.reorderLevel);
+}
+
+export function getReorderSuggestions(items: InventoryItem[]): ReorderSuggestion[] {
+  return items
+    .filter((i) => i.status !== "in_stock")
+    .map((item) => {
+      const suggestedQty = getSuggestedReorderQty(item);
+      return {
+        item,
+        suggestedQty,
+        restockCost: suggestedQty * item.unitPrice,
+      };
+    })
+    .sort((a, b) => {
+      if (a.item.status === "out_of_stock" && b.item.status !== "out_of_stock") {
+        return -1;
+      }
+      if (b.item.status === "out_of_stock" && a.item.status !== "out_of_stock") {
+        return 1;
+      }
+      return a.item.quantity - b.item.quantity;
+    });
 }

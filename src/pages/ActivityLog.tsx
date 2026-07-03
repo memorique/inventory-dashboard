@@ -7,12 +7,14 @@ const actionLabels: Record<ActivityEntry["action"], string> = {
   restock: "Restock",
   sale: "Sale",
   adjustment: "Adjustment",
+  add: "New product",
 };
 
 const actionStyles: Record<ActivityEntry["action"], string> = {
   restock: "bg-teal-50 text-teal-700 border-teal-100",
   sale: "bg-amber-50 text-amber-700 border-amber-100",
   adjustment: "bg-slate-100 text-slate-700 border-slate-200",
+  add: "bg-violet-50 text-violet-700 border-violet-100",
 };
 
 function formatTimestamp(iso: string) {

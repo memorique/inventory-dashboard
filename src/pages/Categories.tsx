@@ -1,18 +1,20 @@
-import { categories, inventoryItems } from "../data/dummyInventory";
+import { useInventory } from "../context/InventoryContext";
 
 export default function Categories() {
+  const { items, categories } = useInventory();
+
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-slate-900">Categories</h1>
         <p className="text-sm text-slate-500 mt-1">
-          Summary by product category (dummy data)
+          Summary by product category (updates with stock changes)
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {categories.map((cat) => {
-          const itemsInCat = inventoryItems.filter(
+          const itemsInCat = items.filter(
             (i) => i.category === cat.name
           );
           return (

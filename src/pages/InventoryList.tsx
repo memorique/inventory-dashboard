@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { FiSearch } from "react-icons/fi";
 import InventoryTable from "../components/InventoryTable";
-import { inventoryItems } from "../data/dummyInventory";
+import { useInventory } from "../context/InventoryContext";
 import type { StockStatus } from "../types/inventory";
 
 const statusFilters: { value: StockStatus | "all"; label: string }[] = [
@@ -12,18 +12,19 @@ const statusFilters: { value: StockStatus | "all"; label: string }[] = [
 ];
 
 export default function InventoryList() {
+  const { items, adjustStock } = useInventory();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<StockStatus | "all">("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
 
   const categories = useMemo(
-    () => ["all", ...new Set(inventoryItems.map((i) => i.category))],
-    []
+    () => ["all", ...new Set(items.map((i) => i.category))],
+    [items]
   );
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return inventoryItems.filter((item) => {
+    return items.filter((item) => {
       const matchesSearch =
         !q ||
         item.name.toLowerCase().includes(q) ||
@@ -35,14 +36,14 @@ export default function InventoryList() {
         categoryFilter === "all" || item.category === categoryFilter;
       return matchesSearch && matchesStatus && matchesCategory;
     });
-  }, [search, statusFilter, categoryFilter]);
+  }, [items, search, statusFilter, categoryFilter]);
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-slate-900">Inventory</h1>
         <p className="text-sm text-slate-500 mt-1">
-          {filtered.length} of {inventoryItems.length} items
+          {filtered.length} of {items.length} items · use +/- to adjust stock
         </p>
       </div>
 
@@ -91,7 +92,11 @@ export default function InventoryList() {
         </div>
       </div>
 
-      <InventoryTable items={filtered} />
+      <InventoryTable
+        items={filtered}
+        adjustable
+        onAdjust={adjustStock}
+      />
     </div>
   );
 }

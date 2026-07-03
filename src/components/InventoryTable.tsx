@@ -1,11 +1,18 @@
-import type { InventoryItem } from "../types/inventory";
+import { FiMinus, FiPlus } from "react-icons/fi";
+import type { InventoryItem, StockAction } from "../types/inventory";
 import StatusBadge from "./StatusBadge";
 
 interface InventoryTableProps {
   items: InventoryItem[];
+  adjustable?: boolean;
+  onAdjust?: (itemId: string, change: number, action: StockAction) => void;
 }
 
-export default function InventoryTable({ items }: InventoryTableProps) {
+export default function InventoryTable({
+  items,
+  adjustable = false,
+  onAdjust,
+}: InventoryTableProps) {
   if (items.length === 0) {
     return (
       <div className="bg-white rounded-xl border border-slate-200 p-12 text-center text-slate-500">
@@ -24,6 +31,9 @@ export default function InventoryTable({ items }: InventoryTableProps) {
               <th className="px-4 py-3 font-semibold">Product</th>
               <th className="px-4 py-3 font-semibold">Category</th>
               <th className="px-4 py-3 font-semibold text-right">Qty</th>
+              {adjustable && (
+                <th className="px-4 py-3 font-semibold text-center">Adjust</th>
+              )}
               <th className="px-4 py-3 font-semibold text-right">Unit price</th>
               <th className="px-4 py-3 font-semibold">Location</th>
               <th className="px-4 py-3 font-semibold">Status</th>
@@ -39,9 +49,40 @@ export default function InventoryTable({ items }: InventoryTableProps) {
                   {item.name}
                 </td>
                 <td className="px-4 py-3 text-slate-600">{item.category}</td>
-                <td className="px-4 py-3 text-right tabular-nums">
+                <td className="px-4 py-3 text-right tabular-nums font-medium">
                   {item.quantity}
                 </td>
+                {adjustable && onAdjust && (
+                  <td className="px-4 py-3">
+                    <div className="flex items-center justify-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => onAdjust(item.id, -1, "sale")}
+                        disabled={item.quantity === 0}
+                        title="Remove 1 unit"
+                        className="flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                      >
+                        <FiMinus size={14} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => onAdjust(item.id, 1, "restock")}
+                        title="Add 1 unit"
+                        className="flex h-7 w-7 items-center justify-center rounded-md border border-brand-200 bg-brand-50 text-brand-700 hover:bg-brand-100 transition-colors"
+                      >
+                        <FiPlus size={14} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => onAdjust(item.id, 10, "restock")}
+                        title="Add 10 units"
+                        className="px-2 h-7 rounded-md border border-brand-200 bg-brand-50 text-brand-700 text-xs font-medium hover:bg-brand-100 transition-colors"
+                      >
+                        +10
+                      </button>
+                    </div>
+                  </td>
+                )}
                 <td className="px-4 py-3 text-right tabular-nums text-slate-600">
                   ${item.unitPrice.toFixed(2)}
                 </td>

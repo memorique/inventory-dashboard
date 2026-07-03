@@ -7,6 +7,7 @@ import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import InventoryList from "./pages/InventoryList";
 import Categories from "./pages/Categories";
+import ActivityLog from "./pages/ActivityLog";
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
         <Route index element={<Dashboard />} />
         <Route path="inventory" element={<InventoryList />} />
         <Route path="categories" element={<Categories />} />
+        <Route path="activity" element={<ActivityLog />} />
       </Route>
     </Routes>
   );

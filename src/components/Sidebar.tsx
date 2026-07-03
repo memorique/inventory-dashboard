@@ -1,5 +1,6 @@
 import { NavLink, useNavigate } from "react-router";
 import {
+  FiActivity,
   FiBox,
   FiGrid,
   FiLayers,
@@ -12,6 +13,7 @@ const navItems = [
   { to: "/dashboard", label: "Dashboard", icon: FiGrid, end: true },
   { to: "/dashboard/inventory", label: "Inventory", icon: FiPackage, end: false },
   { to: "/dashboard/categories", label: "Categories", icon: FiLayers, end: false },
+  { to: "/dashboard/activity", label: "Activity", icon: FiActivity, end: false },
 ];
 
 export default function Sidebar() {

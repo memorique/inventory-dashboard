@@ -7,14 +7,11 @@ import {
 } from "react-icons/fi";
 import { StatCard } from "../components/StatsCards";
 import InventoryTable from "../components/InventoryTable";
-import {
-  getInventoryStats,
-  inventoryItems,
-} from "../data/dummyInventory";
+import { useInventory } from "../context/InventoryContext";
 
 export default function Dashboard() {
-  const stats = getInventoryStats(inventoryItems);
-  const recentLowStock = inventoryItems
+  const { items, stats } = useInventory();
+  const recentLowStock = items
     .filter((i) => i.status !== "in_stock")
     .slice(0, 5);
 

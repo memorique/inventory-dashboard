@@ -11,6 +11,10 @@ import ActivityLog from "./pages/ActivityLog";
 import ReorderList from "./pages/ReorderList";
 import AddProduct from "./pages/AddProduct";
 import Analytics from "./pages/Analytics";
+import Suppliers from "./pages/Suppliers";
+import PurchaseOrders from "./pages/PurchaseOrders";
+import PurchaseOrderForm from "./pages/PurchaseOrderForm";
+import PurchaseOrderDetail from "./pages/PurchaseOrderDetail";
 
 function App() {
   return (
@@ -33,6 +37,14 @@ function App() {
         <Route path="reorders" element={<ReorderList />} />
         <Route path="analytics" element={<Analytics />} />
         <Route path="add-product" element={<AddProduct />} />
+        <Route path="suppliers" element={<Suppliers />} />
+        <Route path="purchase-orders" element={<PurchaseOrders />} />
+        <Route path="purchase-orders/new" element={<PurchaseOrderForm />} />
+        <Route path="purchase-orders/:id" element={<PurchaseOrderDetail />} />
+        <Route
+          path="purchase-orders/:id/edit"
+          element={<PurchaseOrderForm />}
+        />
       </Route>
     </Routes>
   );

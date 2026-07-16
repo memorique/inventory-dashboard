@@ -1,12 +1,22 @@
 import { useMemo } from "react";
-import { FiCheckCircle, FiPackage, FiShoppingCart } from "react-icons/fi";
+import { useNavigate } from "react-router";
+import {
+  FiCheckCircle,
+  FiFilePlus,
+  FiPackage,
+  FiShoppingCart,
+} from "react-icons/fi";
 import { StatCard } from "../components/StatsCards";
 import StatusBadge from "../components/StatusBadge";
 import { useInventory } from "../context/InventoryContext";
+import { useProcurement } from "../context/ProcurementContext";
 import { getReorderSuggestions } from "../utils/inventory";
+import { findSupplierForCategory } from "../utils/procurement";
 
 export default function ReorderList() {
   const { items, adjustStock } = useInventory();
+  const { suppliers, createDraftsFromReorders } = useProcurement();
+  const navigate = useNavigate();
 
   const suggestions = useMemo(() => getReorderSuggestions(items), [items]);
 
@@ -19,6 +29,24 @@ export default function ReorderList() {
     }
   }
 
+  function handleGeneratePos() {
+    const { created, unmatched } = createDraftsFromReorders(suggestions);
+    if (created === 0) {
+      window.alert(
+        "No matching suppliers found for these items. Add suppliers with matching categories first."
+      );
+      return;
+    }
+    if (unmatched.length > 0) {
+      window.alert(
+        `Created ${created} draft purchase order(s). ${unmatched.length} item(s) had no matching supplier and were skipped:\n\n${unmatched.join(
+          "\n"
+        )}`
+      );
+    }
+    navigate("/dashboard/purchase-orders");
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
@@ -29,14 +57,25 @@ export default function ReorderList() {
           </p>
         </div>
         {suggestions.length > 0 && (
-          <button
-            type="button"
-            onClick={handleRestockAll}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-brand-600 text-white text-sm font-medium hover:bg-brand-700 transition-colors shrink-0"
-          >
-            <FiShoppingCart size={16} />
-            Restock all ({suggestions.length})
-          </button>
+          <div className="flex flex-wrap gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={handleGeneratePos}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-brand-600 text-white text-sm font-medium hover:bg-brand-700 transition-colors"
+            >
+              <FiFilePlus size={16} />
+              Generate purchase orders
+            </button>
+            <button
+              type="button"
+              onClick={handleRestockAll}
+              title="Instantly add suggested quantities to stock"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+            >
+              <FiShoppingCart size={16} />
+              Quick restock all
+            </button>
+          </div>
         )}
       </div>
 
@@ -82,6 +121,7 @@ export default function ReorderList() {
                 <tr className="bg-slate-50 border-b border-slate-200 text-slate-600">
                   <th className="px-4 py-3 font-semibold">Product</th>
                   <th className="px-4 py-3 font-semibold">Status</th>
+                  <th className="px-4 py-3 font-semibold">Supplier</th>
                   <th className="px-4 py-3 font-semibold text-right">On hand</th>
                   <th className="px-4 py-3 font-semibold text-right">Reorder at</th>
                   <th className="px-4 py-3 font-semibold text-right">Suggested</th>
@@ -101,6 +141,11 @@ export default function ReorderList() {
                     </td>
                     <td className="px-4 py-3">
                       <StatusBadge status={item.status} />
+                    </td>
+                    <td className="px-4 py-3 text-slate-600 text-xs">
+                      {findSupplierForCategory(item.category, suppliers)?.name ?? (
+                        <span className="text-slate-400">Unassigned</span>
+                      )}
                     </td>
                     <td className="px-4 py-3 text-right tabular-nums font-medium">
                       {item.quantity}

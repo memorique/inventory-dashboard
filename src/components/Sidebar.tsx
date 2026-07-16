@@ -2,6 +2,7 @@ import { NavLink, useNavigate } from "react-router";
 import {
   FiActivity,
   FiBox,
+  FiClipboard,
   FiPlusCircle,
   FiGrid,
   FiLayers,
@@ -9,6 +10,7 @@ import {
   FiPackage,
   FiShoppingCart,
   FiTrendingUp,
+  FiTruck,
 } from "react-icons/fi";
 import { useAuth } from "../context/AuthContext";
 
@@ -17,6 +19,8 @@ const navItems = [
   { to: "/dashboard/inventory", label: "Inventory", icon: FiPackage, end: false },
   { to: "/dashboard/add-product", label: "Add product", icon: FiPlusCircle, end: false },
   { to: "/dashboard/reorders", label: "Reorders", icon: FiShoppingCart, end: false },
+  { to: "/dashboard/suppliers", label: "Suppliers", icon: FiTruck, end: false },
+  { to: "/dashboard/purchase-orders", label: "Purchase orders", icon: FiClipboard, end: false },
   { to: "/dashboard/analytics", label: "Analytics", icon: FiTrendingUp, end: false },
   { to: "/dashboard/categories", label: "Categories", icon: FiLayers, end: false },
   { to: "/dashboard/activity", label: "Activity", icon: FiActivity, end: false },

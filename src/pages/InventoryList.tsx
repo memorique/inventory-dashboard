@@ -3,6 +3,7 @@ import { Link } from "react-router";
 import { FiPlus, FiSearch } from "react-icons/fi";
 import InventoryTable from "../components/InventoryTable";
 import { useInventory } from "../context/InventoryContext";
+import { useProcurement } from "../context/ProcurementContext";
 import type { StockStatus } from "../types/inventory";
 
 const statusFilters: { value: StockStatus | "all"; label: string }[] = [
@@ -14,6 +15,7 @@ const statusFilters: { value: StockStatus | "all"; label: string }[] = [
 
 export default function InventoryList() {
   const { items, adjustStock } = useInventory();
+  const { onOrderByItem } = useProcurement();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<StockStatus | "all">("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
@@ -106,6 +108,7 @@ export default function InventoryList() {
         items={filtered}
         adjustable
         onAdjust={adjustStock}
+        onOrderByItem={onOrderByItem}
       />
     </div>
   );

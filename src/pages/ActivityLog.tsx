@@ -2,12 +2,14 @@ import { FiClock, FiDownload, FiRotateCcw } from "react-icons/fi";
 import { Link } from "react-router";
 import type { ActivityEntry } from "../types/inventory";
 import { useInventory } from "../context/InventoryContext";
+import { useProcurement } from "../context/ProcurementContext";
 
 const actionLabels: Record<ActivityEntry["action"], string> = {
   restock: "Restock",
   sale: "Sale",
   adjustment: "Adjustment",
   add: "New product",
+  receive: "PO received",
 };
 
 const actionStyles: Record<ActivityEntry["action"], string> = {
@@ -15,6 +17,7 @@ const actionStyles: Record<ActivityEntry["action"], string> = {
   sale: "bg-amber-50 text-amber-700 border-amber-100",
   adjustment: "bg-slate-100 text-slate-700 border-slate-200",
   add: "bg-violet-50 text-violet-700 border-violet-100",
+  receive: "bg-brand-50 text-brand-700 border-brand-100",
 };
 
 function formatTimestamp(iso: string) {
@@ -63,6 +66,7 @@ function exportActivityCsv(activity: ActivityEntry[]) {
 
 export default function ActivityLog() {
   const { activity, resetInventory } = useInventory();
+  const { resetProcurement } = useProcurement();
 
   return (
     <div className="space-y-6">
@@ -89,10 +93,11 @@ export default function ActivityLog() {
             onClick={() => {
               if (
                 window.confirm(
-                  "Reset all inventory to default sample data and clear activity?"
+                  "Reset all inventory, suppliers, and purchase orders to default sample data and clear activity?"
                 )
               ) {
                 resetInventory();
+                resetProcurement();
               }
             }}
             className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"

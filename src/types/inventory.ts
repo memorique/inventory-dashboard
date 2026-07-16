@@ -1,6 +1,6 @@
 export type StockStatus = "in_stock" | "low_stock" | "out_of_stock";
 
-export type StockAction = "restock" | "sale" | "adjustment" | "add";
+export type StockAction = "restock" | "sale" | "adjustment" | "add" | "receive";
 
 export interface NewInventoryItem {
   sku: string;
@@ -68,4 +68,54 @@ export interface StockEvent {
   quantity: number;
   delta?: number;
   note: string;
+}
+
+export interface Supplier {
+  id: string;
+  name: string;
+  contactName: string;
+  email: string;
+  phone: string;
+  leadTimeDays: number;
+  categories: string[];
+  notes: string;
+  createdAt: string;
+}
+
+export interface NewSupplier {
+  name: string;
+  contactName: string;
+  email: string;
+  phone: string;
+  leadTimeDays: number;
+  categories: string[];
+  notes: string;
+}
+
+export type PurchaseOrderStatus =
+  | "draft"
+  | "ordered"
+  | "received"
+  | "cancelled";
+
+export interface PurchaseOrderLine {
+  itemId: string;
+  sku: string;
+  name: string;
+  quantity: number;
+  unitCost: number;
+}
+
+export interface PurchaseOrder {
+  id: string;
+  poNumber: string;
+  supplierId: string;
+  supplierName: string;
+  status: PurchaseOrderStatus;
+  lines: PurchaseOrderLine[];
+  notes: string;
+  createdAt: string;
+  orderedAt: string | null;
+  expectedAt: string | null;
+  receivedAt: string | null;
 }

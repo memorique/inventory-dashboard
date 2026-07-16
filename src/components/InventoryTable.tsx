@@ -6,12 +6,14 @@ interface InventoryTableProps {
   items: InventoryItem[];
   adjustable?: boolean;
   onAdjust?: (itemId: string, change: number, action: StockAction) => void;
+  onOrderByItem?: Record<string, number>;
 }
 
 export default function InventoryTable({
   items,
   adjustable = false,
   onAdjust,
+  onOrderByItem,
 }: InventoryTableProps) {
   if (items.length === 0) {
     return (
@@ -51,6 +53,14 @@ export default function InventoryTable({
                 <td className="px-4 py-3 text-slate-600">{item.category}</td>
                 <td className="px-4 py-3 text-right tabular-nums font-medium">
                   {item.quantity}
+                  {onOrderByItem && onOrderByItem[item.id] > 0 && (
+                    <span
+                      title={`${onOrderByItem[item.id]} units on order`}
+                      className="ml-1.5 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-50 text-amber-700 border border-amber-100 align-middle"
+                    >
+                      +{onOrderByItem[item.id]} on order
+                    </span>
+                  )}
                 </td>
                 {adjustable && onAdjust && (
                   <td className="px-4 py-3">

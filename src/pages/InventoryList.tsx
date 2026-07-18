@@ -47,7 +47,8 @@ export default function InventoryList() {
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Inventory</h1>
           <p className="text-sm text-slate-500 mt-1">
-            {filtered.length} of {items.length} items · use +/- to adjust stock
+            {filtered.length} of {items.length} items · click a product name or
+            edit icon to update
           </p>
         </div>
         <Link
@@ -107,6 +108,7 @@ export default function InventoryList() {
       <InventoryTable
         items={filtered}
         adjustable
+        editable
         onAdjust={adjustStock}
         onOrderByItem={onOrderByItem}
       />

@@ -31,6 +31,8 @@ interface InventoryContextValue {
   categories: ReturnType<typeof getCategorySummaries>;
   adjustStock: (itemId: string, change: number, action: StockAction) => void;
   addItem: (item: NewInventoryItem) => string | null;
+  updateItem: (itemId: string, item: NewInventoryItem) => string | null;
+  deleteItem: (itemId: string) => string | null;
   resetInventory: () => void;
 }
 
@@ -163,6 +165,92 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
     [items, user?.name]
   );
 
+  const updateItem = useCallback(
+    (itemId: string, input: NewInventoryItem): string | null => {
+      const sku = input.sku.trim().toUpperCase();
+      const name = input.name.trim();
+      const category = input.category.trim();
+
+      if (!sku || !name || !category || !input.location.trim()) {
+        return "Please fill in all required fields.";
+      }
+      if (input.quantity < 0 || input.reorderLevel < 0 || input.unitPrice < 0) {
+        return "Quantity, reorder level, and price cannot be negative.";
+      }
+
+      const existing = items.find((i) => i.id === itemId);
+      if (!existing) {
+        return "Product not found.";
+      }
+
+      const duplicate = items.some(
+        (i) => i.id !== itemId && i.sku.toUpperCase() === sku
+      );
+      if (duplicate) {
+        return "An item with this SKU already exists.";
+      }
+
+      const updated = withComputedStatus({
+        ...existing,
+        sku,
+        name,
+        category,
+        quantity: input.quantity,
+        reorderLevel: input.reorderLevel,
+        unitPrice: input.unitPrice,
+        location: input.location.trim(),
+        lastUpdated: new Date().toISOString().slice(0, 10),
+      });
+
+      setItems((prev) => prev.map((i) => (i.id === itemId ? updated : i)));
+
+      const entry: ActivityEntry = {
+        id: crypto.randomUUID(),
+        itemId: updated.id,
+        itemName: updated.name,
+        sku: updated.sku,
+        previousQty: existing.quantity,
+        newQty: updated.quantity,
+        change: updated.quantity - existing.quantity,
+        action: "edit",
+        userName: user?.name ?? "Unknown",
+        timestamp: new Date().toISOString(),
+      };
+      setActivity((acts) => [entry, ...acts].slice(0, 100));
+
+      return null;
+    },
+    [items, user?.name]
+  );
+
+  const deleteItem = useCallback(
+    (itemId: string): string | null => {
+      const existing = items.find((i) => i.id === itemId);
+      if (!existing) {
+        return "Product not found.";
+      }
+
+      setItems((prev) => prev.filter((i) => i.id !== itemId));
+
+      const entry: ActivityEntry = {
+        id: crypto.randomUUID(),
+        itemId: existing.id,
+        itemName: existing.name,
+        sku: existing.sku,
+        previousQty: existing.quantity,
+        newQty: 0,
+        change: -existing.quantity,
+        action: "remove",
+        userName: user?.name ?? "Unknown",
+        timestamp: new Date().toISOString(),
+      };
+      setActivity((acts) => [entry, ...acts].slice(0, 100));
+
+      return null;
+    },
+    [items, user?.name]
+  );
+
   const resetInventory = useCallback(() => {
     const reset = defaultItems.map(withComputedStatus);
     setItems(reset);
@@ -182,9 +270,21 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
       categories,
       adjustStock,
       addItem,
+      updateItem,
+      deleteItem,
       resetInventory,
     }),
-    [items, activity, stats, categories, adjustStock, addItem, resetInventory]
+    [
+      items,
+      activity,
+      stats,
+      categories,
+      adjustStock,
+      addItem,
+      updateItem,
+      deleteItem,
+      resetInventory,
+    ]
   );
 
   return (

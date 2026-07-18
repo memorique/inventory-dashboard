@@ -1,10 +1,12 @@
-import { FiMinus, FiPlus } from "react-icons/fi";
+import { Link } from "react-router";
+import { FiEdit2, FiMinus, FiPlus } from "react-icons/fi";
 import type { InventoryItem, StockAction } from "../types/inventory";
 import StatusBadge from "./StatusBadge";
 
 interface InventoryTableProps {
   items: InventoryItem[];
   adjustable?: boolean;
+  editable?: boolean;
   onAdjust?: (itemId: string, change: number, action: StockAction) => void;
   onOrderByItem?: Record<string, number>;
 }
@@ -12,6 +14,7 @@ interface InventoryTableProps {
 export default function InventoryTable({
   items,
   adjustable = false,
+  editable = false,
   onAdjust,
   onOrderByItem,
 }: InventoryTableProps) {
@@ -39,6 +42,9 @@ export default function InventoryTable({
               <th className="px-4 py-3 font-semibold text-right">Unit price</th>
               <th className="px-4 py-3 font-semibold">Location</th>
               <th className="px-4 py-3 font-semibold">Status</th>
+              {editable && (
+                <th className="px-4 py-3 font-semibold text-center">Edit</th>
+              )}
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
@@ -48,7 +54,16 @@ export default function InventoryTable({
                   {item.sku}
                 </td>
                 <td className="px-4 py-3 font-medium text-slate-900">
-                  {item.name}
+                  {editable ? (
+                    <Link
+                      to={`/dashboard/inventory/${item.id}/edit`}
+                      className="hover:text-brand-700 transition-colors"
+                    >
+                      {item.name}
+                    </Link>
+                  ) : (
+                    item.name
+                  )}
                 </td>
                 <td className="px-4 py-3 text-slate-600">{item.category}</td>
                 <td className="px-4 py-3 text-right tabular-nums font-medium">
@@ -102,6 +117,17 @@ export default function InventoryTable({
                 <td className="px-4 py-3">
                   <StatusBadge status={item.status} />
                 </td>
+                {editable && (
+                  <td className="px-4 py-3 text-center">
+                    <Link
+                      to={`/dashboard/inventory/${item.id}/edit`}
+                      title="Edit product"
+                      className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-slate-600 hover:bg-slate-100 hover:text-brand-700 transition-colors"
+                    >
+                      <FiEdit2 size={14} />
+                    </Link>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>

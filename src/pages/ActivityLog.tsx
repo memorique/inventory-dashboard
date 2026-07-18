@@ -9,6 +9,8 @@ const actionLabels: Record<ActivityEntry["action"], string> = {
   sale: "Sale",
   adjustment: "Adjustment",
   add: "New product",
+  edit: "Edited",
+  remove: "Deleted",
   receive: "PO received",
 };
 
@@ -17,6 +19,8 @@ const actionStyles: Record<ActivityEntry["action"], string> = {
   sale: "bg-amber-50 text-amber-700 border-amber-100",
   adjustment: "bg-slate-100 text-slate-700 border-slate-200",
   add: "bg-violet-50 text-violet-700 border-violet-100",
+  edit: "bg-sky-50 text-sky-700 border-sky-100",
+  remove: "bg-rose-50 text-rose-700 border-rose-100",
   receive: "bg-brand-50 text-brand-700 border-brand-100",
 };
 

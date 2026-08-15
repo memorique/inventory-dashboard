@@ -7,6 +7,7 @@ import {
   FiGrid,
   FiLayers,
   FiLogOut,
+  FiMapPin,
   FiPackage,
   FiShoppingCart,
   FiTrendingUp,
@@ -23,6 +24,7 @@ const navItems = [
   { to: "/dashboard/purchase-orders", label: "Purchase orders", icon: FiClipboard, end: false },
   { to: "/dashboard/analytics", label: "Analytics", icon: FiTrendingUp, end: false },
   { to: "/dashboard/categories", label: "Categories", icon: FiLayers, end: false },
+  { to: "/dashboard/locations", label: "Locations", icon: FiMapPin, end: false },
   { to: "/dashboard/activity", label: "Activity", icon: FiActivity, end: false },
 ];
 

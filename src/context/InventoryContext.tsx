@@ -30,6 +30,9 @@ interface InventoryContextValue {
   stats: ReturnType<typeof getInventoryStats>;
   categories: ReturnType<typeof getCategorySummaries>;
   adjustStock: (itemId: string, change: number, action: StockAction) => void;
+  applyStockCounts: (
+    counts: { itemId: string; countedQty: number }[]
+  ) => number;
   addItem: (item: NewInventoryItem) => string | null;
   updateItem: (itemId: string, item: NewInventoryItem) => string | null;
   deleteItem: (itemId: string) => string | null;
@@ -109,6 +112,47 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
       });
     },
     [user?.name]
+  );
+
+  const applyStockCounts = useCallback(
+    (counts: { itemId: string; countedQty: number }[]): number => {
+      const byId = new Map(
+        counts.map((c) => [c.itemId, Math.max(0, Math.floor(c.countedQty))])
+      );
+
+      const entries: ActivityEntry[] = [];
+      const nextItems = items.map((item) => {
+        if (!byId.has(item.id)) return item;
+        const counted = byId.get(item.id)!;
+        if (counted === item.quantity) return item;
+
+        entries.push({
+          id: crypto.randomUUID(),
+          itemId: item.id,
+          itemName: item.name,
+          sku: item.sku,
+          previousQty: item.quantity,
+          newQty: counted,
+          change: counted - item.quantity,
+          action: "adjustment",
+          userName: user?.name ?? "Unknown",
+          timestamp: new Date().toISOString(),
+        });
+
+        return withComputedStatus({
+          ...item,
+          quantity: counted,
+          lastUpdated: new Date().toISOString().slice(0, 10),
+        });
+      });
+
+      if (entries.length === 0) return 0;
+
+      setItems(nextItems);
+      setActivity((acts) => [...entries, ...acts].slice(0, 100));
+      return entries.length;
+    },
+    [items, user?.name]
   );
 
   const addItem = useCallback(
@@ -269,6 +313,7 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
       stats,
       categories,
       adjustStock,
+      applyStockCounts,
       addItem,
       updateItem,
       deleteItem,
@@ -280,6 +325,7 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
       stats,
       categories,
       adjustStock,
+      applyStockCounts,
       addItem,
       updateItem,
       deleteItem,

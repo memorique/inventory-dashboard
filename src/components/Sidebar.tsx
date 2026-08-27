@@ -8,6 +8,7 @@ import {
   FiLayers,
   FiLogOut,
   FiMapPin,
+  FiCheckSquare,
   FiPackage,
   FiShoppingCart,
   FiTrendingUp,
@@ -25,6 +26,7 @@ const navItems = [
   { to: "/dashboard/analytics", label: "Analytics", icon: FiTrendingUp, end: false },
   { to: "/dashboard/categories", label: "Categories", icon: FiLayers, end: false },
   { to: "/dashboard/locations", label: "Locations", icon: FiMapPin, end: false },
+  { to: "/dashboard/stock-count", label: "Stock count", icon: FiCheckSquare, end: false },
   { to: "/dashboard/activity", label: "Activity", icon: FiActivity, end: false },
 ];
 

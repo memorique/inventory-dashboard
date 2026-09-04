@@ -1,6 +1,7 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { Link, Navigate, useNavigate, useParams } from "react-router";
 import { FiSave, FiTrash2 } from "react-icons/fi";
+import { usePermission } from "../context/AuthContext";
 import { useInventory } from "../context/InventoryContext";
 
 const emptyForm = {
@@ -16,6 +17,7 @@ const emptyForm = {
 export default function EditProduct() {
   const { id } = useParams<{ id: string }>();
   const { items, updateItem, deleteItem } = useInventory();
+  const { canManageProducts, canDeleteProducts } = usePermission();
   const navigate = useNavigate();
   const [form, setForm] = useState(emptyForm);
   const [error, setError] = useState("");
@@ -58,7 +60,7 @@ export default function EditProduct() {
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    if (!id) return;
+    if (!id || !canManageProducts) return;
     setError("");
 
     const err = updateItem(id, {
@@ -80,7 +82,7 @@ export default function EditProduct() {
   }
 
   function handleDelete() {
-    if (!id || !item) return;
+    if (!id || !item || !canDeleteProducts) return;
     if (
       !window.confirm(
         `Delete "${item.name}" (${item.sku})? This cannot be undone.`
@@ -246,7 +248,13 @@ export default function EditProduct() {
           <div className="flex flex-wrap gap-3">
             <button
               type="submit"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-brand-600 text-white text-sm font-medium hover:bg-brand-700 transition-colors"
+              disabled={!canManageProducts}
+              title={
+                canManageProducts
+                  ? undefined
+                  : "Managers and admins can edit products"
+              }
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-brand-600 text-white text-sm font-medium hover:bg-brand-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <FiSave size={16} />
               Save changes
@@ -261,7 +269,13 @@ export default function EditProduct() {
           <button
             type="button"
             onClick={handleDelete}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-rose-200 bg-rose-50 text-rose-700 text-sm font-medium hover:bg-rose-100 transition-colors"
+            disabled={!canDeleteProducts}
+            title={
+              canDeleteProducts
+                ? undefined
+                : "Managers and admins can delete products"
+            }
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-rose-200 bg-rose-50 text-rose-700 text-sm font-medium hover:bg-rose-100 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <FiTrash2 size={16} />
             Delete

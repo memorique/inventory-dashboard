@@ -1,6 +1,7 @@
 import { FiClock, FiDownload, FiRotateCcw } from "react-icons/fi";
 import { Link } from "react-router";
 import type { ActivityEntry } from "../types/inventory";
+import { usePermission } from "../context/AuthContext";
 import { useInventory } from "../context/InventoryContext";
 import { useProcurement } from "../context/ProcurementContext";
 
@@ -71,6 +72,19 @@ function exportActivityCsv(activity: ActivityEntry[]) {
 export default function ActivityLog() {
   const { activity, resetInventory } = useInventory();
   const { resetProcurement } = useProcurement();
+  const { canResetData } = usePermission();
+
+  function handleReset() {
+    if (!canResetData) return;
+    if (
+      window.confirm(
+        "Reset all inventory, suppliers, and purchase orders to default sample data and clear activity?"
+      )
+    ) {
+      resetInventory();
+      resetProcurement();
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -94,17 +108,10 @@ export default function ActivityLog() {
           )}
           <button
             type="button"
-            onClick={() => {
-              if (
-                window.confirm(
-                  "Reset all inventory, suppliers, and purchase orders to default sample data and clear activity?"
-                )
-              ) {
-                resetInventory();
-                resetProcurement();
-              }
-            }}
-            className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+            onClick={handleReset}
+            disabled={!canResetData}
+            title={canResetData ? undefined : "Only admins can reset data"}
+            className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <FiRotateCcw size={16} />
             Reset data

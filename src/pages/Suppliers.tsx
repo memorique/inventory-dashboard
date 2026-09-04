@@ -11,6 +11,7 @@ import {
   FiX,
 } from "react-icons/fi";
 import { StatCard } from "../components/StatsCards";
+import { usePermission } from "../context/AuthContext";
 import { useInventory } from "../context/InventoryContext";
 import { useProcurement } from "../context/ProcurementContext";
 import type { NewSupplier, Supplier } from "../types/inventory";
@@ -34,6 +35,7 @@ export default function Suppliers() {
     updateSupplier,
     deleteSupplier,
   } = useProcurement();
+  const { canManageSuppliers } = usePermission();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -65,6 +67,7 @@ export default function Suppliers() {
       : 0;
 
   function openCreate() {
+    if (!canManageSuppliers) return;
     setEditingId(null);
     setForm(emptyForm);
     setCategoriesText("");
@@ -73,6 +76,7 @@ export default function Suppliers() {
   }
 
   function openEdit(supplier: Supplier) {
+    if (!canManageSuppliers) return;
     setEditingId(supplier.id);
     setForm({
       name: supplier.name,
@@ -113,6 +117,7 @@ export default function Suppliers() {
   }
 
   function handleDelete(supplier: Supplier) {
+    if (!canManageSuppliers) return;
     const openPos = poCountBySupplier[supplier.id] ?? 0;
     const warning =
       openPos > 0
@@ -135,7 +140,13 @@ export default function Suppliers() {
         <button
           type="button"
           onClick={openCreate}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-brand-600 text-white text-sm font-medium hover:bg-brand-700 transition-colors shrink-0"
+          disabled={!canManageSuppliers}
+          title={
+            canManageSuppliers
+              ? undefined
+              : "Managers and admins can add suppliers"
+          }
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-brand-600 text-white text-sm font-medium hover:bg-brand-700 transition-colors shrink-0 disabled:opacity-40 disabled:cursor-not-allowed"
         >
           <FiPlus size={16} />
           Add supplier
@@ -200,16 +211,26 @@ export default function Suppliers() {
                     <button
                       type="button"
                       onClick={() => openEdit(supplier)}
-                      title="Edit supplier"
-                      className="flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-slate-500 hover:bg-slate-100 transition-colors"
+                      disabled={!canManageSuppliers}
+                      title={
+                        canManageSuppliers
+                          ? "Edit supplier"
+                          : "Managers and admins can edit suppliers"
+                      }
+                      className="flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-slate-500 hover:bg-slate-100 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       <FiEdit2 size={13} />
                     </button>
                     <button
                       type="button"
                       onClick={() => handleDelete(supplier)}
-                      title="Delete supplier"
-                      className="flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-slate-500 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition-colors"
+                      disabled={!canManageSuppliers}
+                      title={
+                        canManageSuppliers
+                          ? "Delete supplier"
+                          : "Managers and admins can delete suppliers"
+                      }
+                      className="flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-slate-500 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       <FiTrash2 size={13} />
                     </button>

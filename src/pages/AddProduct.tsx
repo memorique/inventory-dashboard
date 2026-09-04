@@ -1,6 +1,7 @@
 import { FormEvent, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { FiPlus } from "react-icons/fi";
+import { usePermission } from "../context/AuthContext";
 import { useInventory } from "../context/InventoryContext";
 
 const emptyForm = {
@@ -15,6 +16,7 @@ const emptyForm = {
 
 export default function AddProduct() {
   const { items, addItem } = useInventory();
+  const { canManageProducts } = usePermission();
   const navigate = useNavigate();
   const [form, setForm] = useState(emptyForm);
   const [error, setError] = useState("");
@@ -33,6 +35,7 @@ export default function AddProduct() {
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
+    if (!canManageProducts) return;
     setError("");
 
     const err = addItem({
@@ -199,7 +202,13 @@ export default function AddProduct() {
         <div className="flex flex-wrap gap-3 pt-2">
           <button
             type="submit"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-brand-600 text-white text-sm font-medium hover:bg-brand-700 transition-colors"
+            disabled={!canManageProducts}
+            title={
+              canManageProducts
+                ? undefined
+                : "Managers and admins can add products"
+            }
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-brand-600 text-white text-sm font-medium hover:bg-brand-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <FiPlus size={16} />
             Add product

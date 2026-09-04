@@ -1,7 +1,18 @@
 import { FormEvent, useState } from "react";
 import { Link, Navigate, useLocation, useNavigate } from "react-router";
 import { FiBox } from "react-icons/fi";
-import { DEMO_ACCOUNT, useAuth } from "../context/AuthContext";
+import {
+  DEMO_ACCOUNT,
+  MANAGER_DEMO_ACCOUNT,
+  STAFF_DEMO_ACCOUNT,
+  useAuth,
+} from "../context/AuthContext";
+
+const demoAccounts = [
+  { ...DEMO_ACCOUNT, label: "Admin" },
+  { ...MANAGER_DEMO_ACCOUNT, label: "Manager" },
+  { ...STAFF_DEMO_ACCOUNT, label: "Staff" },
+];
 
 export default function Login() {
   const { login, user } = useAuth();
@@ -29,11 +40,11 @@ export default function Login() {
     navigate(from, { replace: true });
   }
 
-  function handleDemoLogin() {
+  function handleDemoLogin(account: { email: string; password: string }) {
     setError("");
-    setEmail(DEMO_ACCOUNT.email);
-    setPassword(DEMO_ACCOUNT.password);
-    const err = login(DEMO_ACCOUNT.email, DEMO_ACCOUNT.password);
+    setEmail(account.email);
+    setPassword(account.password);
+    const err = login(account.email, account.password);
     if (err) {
       setError(err);
       return;
@@ -63,18 +74,24 @@ export default function Login() {
               Log in to access your inventory dashboard.
             </p>
 
-            <div className="mt-6 p-4 rounded-lg bg-brand-50 border border-brand-100">
-              <p className="text-sm font-medium text-brand-800">Demo account</p>
-              <p className="text-xs text-brand-700/80 mt-1 font-mono">
-                {DEMO_ACCOUNT.email} / {DEMO_ACCOUNT.password}
+            <div className="mt-6 p-4 rounded-lg bg-brand-50 border border-brand-100 space-y-3">
+              <p className="text-sm font-medium text-brand-800">
+                Demo accounts
               </p>
-              <button
-                type="button"
-                onClick={handleDemoLogin}
-                className="mt-3 w-full py-2 rounded-lg border border-brand-200 bg-white text-sm font-medium text-brand-700 hover:bg-brand-100/50 transition-colors"
-              >
-                Log in as Demo User
-              </button>
+              {demoAccounts.map((account) => (
+                <div key={account.email}>
+                  <p className="text-xs text-brand-700/80 font-mono">
+                    {account.label} · {account.email} / {account.password}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => handleDemoLogin(account)}
+                    className="mt-1 w-full py-2 rounded-lg border border-brand-200 bg-white text-sm font-medium text-brand-700 hover:bg-brand-100/50 transition-colors"
+                  >
+                    Log in as {account.name}
+                  </button>
+                </div>
+              ))}
             </div>
 
             <form onSubmit={handleSubmit} className="mt-6 space-y-4">

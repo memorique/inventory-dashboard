@@ -1,5 +1,6 @@
 import { Routes, Route } from "react-router";
 import ProtectedRoute from "./components/ProtectedRoute";
+import RequireCapability from "./components/RequireCapability";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -18,6 +19,7 @@ import Suppliers from "./pages/Suppliers";
 import PurchaseOrders from "./pages/PurchaseOrders";
 import PurchaseOrderForm from "./pages/PurchaseOrderForm";
 import PurchaseOrderDetail from "./pages/PurchaseOrderDetail";
+import Users from "./pages/Users";
 
 function App() {
   return (
@@ -50,6 +52,14 @@ function App() {
         <Route
           path="purchase-orders/:id/edit"
           element={<PurchaseOrderForm />}
+        />
+        <Route
+          path="users"
+          element={
+            <RequireCapability capability="canManageUsers">
+              <Users />
+            </RequireCapability>
+          }
         />
       </Route>
     </Routes>

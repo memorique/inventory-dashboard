@@ -13,8 +13,9 @@ import {
   FiShoppingCart,
   FiTrendingUp,
   FiTruck,
+  FiUsers,
 } from "react-icons/fi";
-import { useAuth } from "../context/AuthContext";
+import { useAuth, usePermission } from "../context/AuthContext";
 
 const navItems = [
   { to: "/dashboard", label: "Dashboard", icon: FiGrid, end: true },
@@ -32,7 +33,15 @@ const navItems = [
 
 export default function Sidebar() {
   const { logout } = useAuth();
+  const { canManageUsers } = usePermission();
   const navigate = useNavigate();
+
+  const items = canManageUsers
+    ? [
+        ...navItems,
+        { to: "/dashboard/users", label: "Users", icon: FiUsers, end: false },
+      ]
+    : navItems;
 
   function handleLogout() {
     logout();
@@ -56,7 +65,7 @@ export default function Sidebar() {
       </div>
 
       <nav className="flex-1 px-3 py-4 space-y-1">
-        {navItems.map(({ to, label, icon: Icon, end }) => (
+        {items.map(({ to, label, icon: Icon, end }) => (
           <NavLink
             key={to}
             to={to}

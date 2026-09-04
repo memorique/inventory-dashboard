@@ -1,6 +1,7 @@
 import { FormEvent, useMemo, useState } from "react";
 import { Link, Navigate, useLocation, useNavigate, useParams } from "react-router";
 import { FiArrowLeft, FiSave, FiSend, FiTrash2 } from "react-icons/fi";
+import { usePermission } from "../context/AuthContext";
 import { useInventory } from "../context/InventoryContext";
 import { useProcurement } from "../context/ProcurementContext";
 import type { PurchaseOrderLine } from "../types/inventory";
@@ -22,6 +23,7 @@ export default function PurchaseOrderForm() {
     createPurchaseOrder,
     updatePurchaseOrder,
   } = useProcurement();
+  const { canManagePurchaseOrders } = usePermission();
 
   const existing = id ? purchaseOrders.find((po) => po.id === id) : undefined;
   const isEdit = Boolean(existing);
@@ -109,6 +111,7 @@ export default function PurchaseOrderForm() {
   }
 
   function handleSave(status: "draft" | "ordered") {
+    if (!canManagePurchaseOrders) return;
     const err = validate();
     if (err) {
       setError(err);
@@ -358,7 +361,13 @@ export default function PurchaseOrderForm() {
         <div className="flex flex-wrap gap-3">
           <button
             type="submit"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-slate-200 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+            disabled={!canManagePurchaseOrders}
+            title={
+              canManagePurchaseOrders
+                ? undefined
+                : "Managers and admins can manage purchase orders"
+            }
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-slate-200 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <FiSave size={16} />
             {isEdit ? "Save changes" : "Save as draft"}
@@ -367,7 +376,13 @@ export default function PurchaseOrderForm() {
             <button
               type="button"
               onClick={() => handleSave("ordered")}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-brand-600 text-white text-sm font-medium hover:bg-brand-700 transition-colors"
+              disabled={!canManagePurchaseOrders}
+              title={
+                canManagePurchaseOrders
+                  ? undefined
+                  : "Managers and admins can manage purchase orders"
+              }
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-brand-600 text-white text-sm font-medium hover:bg-brand-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <FiSend size={16} />
               Save &amp; place order

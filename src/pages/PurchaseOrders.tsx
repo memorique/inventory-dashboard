@@ -7,6 +7,7 @@ import {
   FiTruck,
 } from "react-icons/fi";
 import { StatCard } from "../components/StatsCards";
+import { usePermission } from "../context/AuthContext";
 import { useProcurement } from "../context/ProcurementContext";
 import type { PurchaseOrderStatus } from "../types/inventory";
 import {
@@ -35,6 +36,7 @@ function formatDate(iso: string | null) {
 
 export default function PurchaseOrders() {
   const { purchaseOrders, stats } = useProcurement();
+  const { canManagePurchaseOrders } = usePermission();
   const [filter, setFilter] = useState<PurchaseOrderStatus | "all">("all");
 
   const filtered = useMemo(
@@ -54,13 +56,23 @@ export default function PurchaseOrders() {
             Track procurement from draft to received
           </p>
         </div>
-        <Link
-          to="/dashboard/purchase-orders/new"
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-brand-600 text-white text-sm font-medium hover:bg-brand-700 transition-colors shrink-0"
-        >
-          <FiPlus size={16} />
-          New purchase order
-        </Link>
+        {canManagePurchaseOrders ? (
+          <Link
+            to="/dashboard/purchase-orders/new"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-brand-600 text-white text-sm font-medium hover:bg-brand-700 transition-colors shrink-0"
+          >
+            <FiPlus size={16} />
+            New purchase order
+          </Link>
+        ) : (
+          <span
+            title="Managers and admins can create purchase orders"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-brand-600 text-white text-sm font-medium shrink-0 opacity-40 cursor-not-allowed"
+          >
+            <FiPlus size={16} />
+            New purchase order
+          </span>
+        )}
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

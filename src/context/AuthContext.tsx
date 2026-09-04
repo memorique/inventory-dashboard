@@ -7,10 +7,12 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { getCapabilities, type Capabilities, type Role } from "../utils/permissions";
 
 export interface User {
   name: string;
   email: string;
+  role: Role;
 }
 
 interface StoredUser extends User {
@@ -23,6 +25,8 @@ interface AuthContextValue {
   login: (email: string, password: string) => string | null;
   signup: (name: string, email: string, password: string) => string | null;
   logout: () => void;
+  listUsers: () => User[];
+  updateUserRole: (email: string, role: Role) => string | null;
 }
 
 const USERS_KEY = "inventory-users";
@@ -32,30 +36,56 @@ export const DEMO_ACCOUNT = {
   name: "Demo User",
   email: "demo@inventory.com",
   password: "demo123",
+  role: "admin",
 } as const;
 
+export const MANAGER_DEMO_ACCOUNT = {
+  name: "Morgan Manager",
+  email: "manager@inventory.com",
+  password: "manager123",
+  role: "manager",
+} as const;
+
+export const STAFF_DEMO_ACCOUNT = {
+  name: "Sam Staff",
+  email: "staff@inventory.com",
+  password: "staff123",
+  role: "staff",
+} as const;
+
+const SEED_ACCOUNTS = [DEMO_ACCOUNT, MANAGER_DEMO_ACCOUNT, STAFF_DEMO_ACCOUNT];
+
 const AuthContext = createContext<AuthContextValue | null>(null);
+
+function toUser(stored: StoredUser): User {
+  return { name: stored.name, email: stored.email, role: stored.role };
+}
 
 function loadUsers(): StoredUser[] {
   try {
     const raw = localStorage.getItem(USERS_KEY);
-    return raw ? (JSON.parse(raw) as StoredUser[]) : [];
+    const parsed = raw ? (JSON.parse(raw) as StoredUser[]) : [];
+    return parsed.map((u) => ({ ...u, role: u.role ?? "staff" }));
   } catch {
     return [];
   }
 }
 
-function ensureDemoUser() {
+function ensureSeedUsers() {
   const users = loadUsers();
-  const exists = users.some((u) => u.email === DEMO_ACCOUNT.email);
-  if (!exists) {
-    users.push({
-      name: DEMO_ACCOUNT.name,
-      email: DEMO_ACCOUNT.email,
-      password: DEMO_ACCOUNT.password,
-    });
-    saveUsers(users);
+  let changed = false;
+  for (const account of SEED_ACCOUNTS) {
+    if (!users.some((u) => u.email === account.email)) {
+      users.push({
+        name: account.name,
+        email: account.email,
+        password: account.password,
+        role: account.role,
+      });
+      changed = true;
+    }
   }
+  if (changed) saveUsers(users);
 }
 
 function saveUsers(users: StoredUser[]) {
@@ -76,8 +106,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    ensureDemoUser();
-    setUser(loadSession());
+    ensureSeedUsers();
+    const session = loadSession();
+    if (session) {
+      const match = loadUsers().find((u) => u.email === session.email);
+      setUser(match ? toUser(match) : session);
+    }
     setIsLoading(false);
   }, []);
 
@@ -102,7 +136,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return "Invalid email or password.";
       }
 
-      persistSession({ name: match.name, email: match.email });
+      persistSession(toUser(match));
       return null;
     },
     [persistSession]
@@ -125,9 +159,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return "An account with this email already exists.";
       }
 
-      users.push({ name: trimmedName, email: normalizedEmail, password });
+      const newUser: StoredUser = {
+        name: trimmedName,
+        email: normalizedEmail,
+        password,
+        role: "staff",
+      };
+      users.push(newUser);
       saveUsers(users);
-      persistSession({ name: trimmedName, email: normalizedEmail });
+      persistSession(toUser(newUser));
       return null;
     },
     [persistSession]
@@ -137,9 +177,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     persistSession(null);
   }, [persistSession]);
 
+  const listUsers = useCallback((): User[] => {
+    return loadUsers().map(toUser);
+  }, []);
+
+  const updateUserRole = useCallback(
+    (email: string, role: Role): string | null => {
+      const normalizedEmail = email.trim().toLowerCase();
+      const users = loadUsers();
+      const match = users.find((u) => u.email === normalizedEmail);
+      if (!match) {
+        return "User not found.";
+      }
+
+      match.role = role;
+      saveUsers(users);
+
+      if (user && user.email === normalizedEmail) {
+        persistSession(toUser(match));
+      }
+
+      return null;
+    },
+    [user, persistSession]
+  );
+
   const value = useMemo(
-    () => ({ user, isLoading, login, signup, logout }),
-    [user, isLoading, login, signup, logout]
+    () => ({
+      user,
+      isLoading,
+      login,
+      signup,
+      logout,
+      listUsers,
+      updateUserRole,
+    }),
+    [user, isLoading, login, signup, logout, listUsers, updateUserRole]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
@@ -151,4 +224,9 @@ export function useAuth() {
     throw new Error("useAuth must be used within AuthProvider");
   }
   return ctx;
+}
+
+export function usePermission(): Capabilities {
+  const { user } = useAuth();
+  return getCapabilities(user?.role);
 }

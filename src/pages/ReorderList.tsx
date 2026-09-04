@@ -8,6 +8,7 @@ import {
 } from "react-icons/fi";
 import { StatCard } from "../components/StatsCards";
 import StatusBadge from "../components/StatusBadge";
+import { usePermission } from "../context/AuthContext";
 import { useInventory } from "../context/InventoryContext";
 import { useProcurement } from "../context/ProcurementContext";
 import { getReorderSuggestions } from "../utils/inventory";
@@ -16,6 +17,7 @@ import { findSupplierForCategory } from "../utils/procurement";
 export default function ReorderList() {
   const { items, adjustStock } = useInventory();
   const { suppliers, createDraftsFromReorders } = useProcurement();
+  const { canManagePurchaseOrders } = usePermission();
   const navigate = useNavigate();
 
   const suggestions = useMemo(() => getReorderSuggestions(items), [items]);
@@ -30,6 +32,7 @@ export default function ReorderList() {
   }
 
   function handleGeneratePos() {
+    if (!canManagePurchaseOrders) return;
     const { created, unmatched } = createDraftsFromReorders(suggestions);
     if (created === 0) {
       window.alert(
@@ -61,7 +64,13 @@ export default function ReorderList() {
             <button
               type="button"
               onClick={handleGeneratePos}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-brand-600 text-white text-sm font-medium hover:bg-brand-700 transition-colors"
+              disabled={!canManagePurchaseOrders}
+              title={
+                canManagePurchaseOrders
+                  ? undefined
+                  : "Managers and admins can generate purchase orders"
+              }
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-brand-600 text-white text-sm font-medium hover:bg-brand-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <FiFilePlus size={16} />
               Generate purchase orders

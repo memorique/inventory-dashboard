@@ -8,6 +8,7 @@ import {
   FiTrash2,
   FiTruck,
 } from "react-icons/fi";
+import { usePermission } from "../context/AuthContext";
 import { useProcurement } from "../context/ProcurementContext";
 import {
   getPoTotal,
@@ -36,6 +37,7 @@ export default function PurchaseOrderDetail() {
     cancelPurchaseOrder,
     deletePurchaseOrder,
   } = useProcurement();
+  const { canManagePurchaseOrders } = usePermission();
 
   const po = purchaseOrders.find((p) => p.id === id);
 
@@ -58,6 +60,7 @@ export default function PurchaseOrderDetail() {
   const units = getPoUnits(po);
 
   function handleReceive() {
+    if (!canManagePurchaseOrders) return;
     if (
       window.confirm(
         `Receive ${po!.poNumber}? This will add ${units} units to inventory stock.`
@@ -68,12 +71,14 @@ export default function PurchaseOrderDetail() {
   }
 
   function handleCancel() {
+    if (!canManagePurchaseOrders) return;
     if (window.confirm(`Cancel ${po!.poNumber}?`)) {
       cancelPurchaseOrder(po!.id);
     }
   }
 
   function handleDelete() {
+    if (!canManagePurchaseOrders) return;
     if (window.confirm(`Delete ${po!.poNumber}? This cannot be undone.`)) {
       deletePurchaseOrder(po!.id);
       navigate("/dashboard/purchase-orders");
@@ -118,17 +123,35 @@ export default function PurchaseOrderDetail() {
           <div className="flex flex-wrap gap-2">
             {po.status === "draft" && (
               <>
-                <Link
-                  to={`/dashboard/purchase-orders/${po.id}/edit`}
-                  className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
-                >
-                  <FiEdit2 size={15} />
-                  Edit
-                </Link>
+                {canManagePurchaseOrders ? (
+                  <Link
+                    to={`/dashboard/purchase-orders/${po.id}/edit`}
+                    className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                  >
+                    <FiEdit2 size={15} />
+                    Edit
+                  </Link>
+                ) : (
+                  <span
+                    title="Managers and admins can edit purchase orders"
+                    className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm font-medium text-slate-700 opacity-40 cursor-not-allowed"
+                  >
+                    <FiEdit2 size={15} />
+                    Edit
+                  </span>
+                )}
                 <button
                   type="button"
-                  onClick={() => placeOrder(po.id)}
-                  className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-brand-600 text-white text-sm font-medium hover:bg-brand-700 transition-colors"
+                  onClick={() => {
+                    if (canManagePurchaseOrders) placeOrder(po.id);
+                  }}
+                  disabled={!canManagePurchaseOrders}
+                  title={
+                    canManagePurchaseOrders
+                      ? undefined
+                      : "Managers and admins can place orders"
+                  }
+                  className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-brand-600 text-white text-sm font-medium hover:bg-brand-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   <FiSend size={15} />
                   Place order
@@ -139,7 +162,13 @@ export default function PurchaseOrderDetail() {
               <button
                 type="button"
                 onClick={handleReceive}
-                className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-brand-600 text-white text-sm font-medium hover:bg-brand-700 transition-colors"
+                disabled={!canManagePurchaseOrders}
+                title={
+                  canManagePurchaseOrders
+                    ? undefined
+                    : "Managers and admins can receive orders"
+                }
+                className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-brand-600 text-white text-sm font-medium hover:bg-brand-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <FiCheckCircle size={15} />
                 Receive order
@@ -149,7 +178,13 @@ export default function PurchaseOrderDetail() {
               <button
                 type="button"
                 onClick={handleCancel}
-                className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm font-medium text-slate-700 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition-colors"
+                disabled={!canManagePurchaseOrders}
+                title={
+                  canManagePurchaseOrders
+                    ? undefined
+                    : "Managers and admins can cancel orders"
+                }
+                className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm font-medium text-slate-700 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <FiSlash size={15} />
                 Cancel
@@ -159,7 +194,13 @@ export default function PurchaseOrderDetail() {
               <button
                 type="button"
                 onClick={handleDelete}
-                className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm font-medium text-slate-700 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition-colors"
+                disabled={!canManagePurchaseOrders}
+                title={
+                  canManagePurchaseOrders
+                    ? undefined
+                    : "Managers and admins can delete orders"
+                }
+                className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm font-medium text-slate-700 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <FiTrash2 size={15} />
                 Delete

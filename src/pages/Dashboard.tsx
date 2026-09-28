@@ -5,12 +5,14 @@ import {
   FiClipboard,
   FiDollarSign,
   FiPackage,
+  FiSend,
   FiTruck,
 } from "react-icons/fi";
 import { StatCard } from "../components/StatsCards";
 import InventoryTable from "../components/InventoryTable";
 import { useInventory } from "../context/InventoryContext";
 import { useProcurement } from "../context/ProcurementContext";
+import { useSales } from "../context/SalesContext";
 import {
   getPoTotal,
   getPoUnits,
@@ -21,6 +23,7 @@ import {
 export default function Dashboard() {
   const { items, stats } = useInventory();
   const { purchaseOrders, onOrderByItem, stats: poStats } = useProcurement();
+  const { reservedByItem, stats: soStats } = useSales();
   const recentLowStock = items
     .filter((i) => i.status !== "in_stock")
     .slice(0, 5);
@@ -81,7 +84,11 @@ export default function Dashboard() {
               Reorder list →
             </Link>
           </div>
-          <InventoryTable items={recentLowStock} onOrderByItem={onOrderByItem} />
+          <InventoryTable
+            items={recentLowStock}
+            onOrderByItem={onOrderByItem}
+            reservedByItem={reservedByItem}
+          />
         </div>
 
         <div>
@@ -154,6 +161,27 @@ export default function Dashboard() {
               </ul>
             )}
           </div>
+
+          <Link
+            to="/dashboard/sales-orders"
+            className="mt-4 flex items-center gap-3 bg-white rounded-xl border border-slate-200 shadow-sm p-5 hover:border-brand-200 transition-colors group"
+          >
+            <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-sky-50 text-sky-700 border border-sky-100">
+              <FiSend size={20} />
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="text-2xl font-bold text-slate-900 leading-tight">
+                {soStats.toShipCount}
+              </p>
+              <p className="text-xs text-slate-500">
+                sales order{soStats.toShipCount !== 1 ? "s" : ""} to ship ·{" "}
+                {soStats.reservedUnits.toLocaleString()} units reserved
+              </p>
+            </div>
+            <span className="text-sm font-medium text-brand-700 group-hover:text-brand-800">
+              →
+            </span>
+          </Link>
         </div>
       </div>
     </div>

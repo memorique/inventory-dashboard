@@ -9,6 +9,7 @@ interface InventoryTableProps {
   editable?: boolean;
   onAdjust?: (itemId: string, change: number, action: StockAction) => void;
   onOrderByItem?: Record<string, number>;
+  reservedByItem?: Record<string, number>;
 }
 
 export default function InventoryTable({
@@ -17,6 +18,7 @@ export default function InventoryTable({
   editable = false,
   onAdjust,
   onOrderByItem,
+  reservedByItem,
 }: InventoryTableProps) {
   if (items.length === 0) {
     return (
@@ -74,6 +76,18 @@ export default function InventoryTable({
                       className="ml-1.5 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-50 text-amber-700 border border-amber-100 align-middle"
                     >
                       +{onOrderByItem[item.id]} on order
+                    </span>
+                  )}
+                  {reservedByItem && reservedByItem[item.id] > 0 && (
+                    <span
+                      title={`${reservedByItem[item.id]} units reserved for confirmed sales orders · ${Math.max(0, item.quantity - reservedByItem[item.id])} available`}
+                      className={`ml-1.5 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium border align-middle ${
+                        reservedByItem[item.id] > item.quantity
+                          ? "bg-rose-50 text-rose-700 border-rose-100"
+                          : "bg-sky-50 text-sky-700 border-sky-100"
+                      }`}
+                    >
+                      {reservedByItem[item.id]} reserved
                     </span>
                   )}
                 </td>

@@ -4,6 +4,7 @@ import { BrowserRouter } from "react-router";
 import { AuthProvider } from "./context/AuthContext";
 import { InventoryProvider } from "./context/InventoryContext";
 import { ProcurementProvider } from "./context/ProcurementContext";
+import { SalesProvider } from "./context/SalesContext";
 import App from "./App";
 import "./index.css";
 
@@ -13,7 +14,9 @@ createRoot(document.getElementById("root")!).render(
       <AuthProvider>
         <InventoryProvider>
           <ProcurementProvider>
-            <App />
+            <SalesProvider>
+              <App />
+            </SalesProvider>
           </ProcurementProvider>
         </InventoryProvider>
       </AuthProvider>

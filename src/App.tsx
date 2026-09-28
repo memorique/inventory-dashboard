@@ -20,6 +20,9 @@ import Suppliers from "./pages/Suppliers";
 import PurchaseOrders from "./pages/PurchaseOrders";
 import PurchaseOrderForm from "./pages/PurchaseOrderForm";
 import PurchaseOrderDetail from "./pages/PurchaseOrderDetail";
+import SalesOrders from "./pages/SalesOrders";
+import SalesOrderForm from "./pages/SalesOrderForm";
+import SalesOrderDetail from "./pages/SalesOrderDetail";
 import Users from "./pages/Users";
 
 function App() {
@@ -55,6 +58,10 @@ function App() {
           path="purchase-orders/:id/edit"
           element={<PurchaseOrderForm />}
         />
+        <Route path="sales-orders" element={<SalesOrders />} />
+        <Route path="sales-orders/new" element={<SalesOrderForm />} />
+        <Route path="sales-orders/:id" element={<SalesOrderDetail />} />
+        <Route path="sales-orders/:id/edit" element={<SalesOrderForm />} />
         <Route
           path="users"
           element={

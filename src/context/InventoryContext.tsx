@@ -33,6 +33,10 @@ interface InventoryContextValue {
   applyStockCounts: (
     counts: { itemId: string; countedQty: number }[]
   ) => number;
+  applyStockChanges: (
+    changes: { itemId: string; change: number }[],
+    action: StockAction
+  ) => string | null;
   addItem: (item: NewInventoryItem) => string | null;
   updateItem: (itemId: string, item: NewInventoryItem) => string | null;
   deleteItem: (itemId: string) => string | null;
@@ -151,6 +155,63 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
       setItems(nextItems);
       setActivity((acts) => [...entries, ...acts].slice(0, 100));
       return entries.length;
+    },
+    [items, user?.name]
+  );
+
+  /**
+   * Applies several stock changes as one all-or-nothing update. Returns an
+   * error (and changes nothing) if any item is missing or would go negative.
+   */
+  const applyStockChanges = useCallback(
+    (
+      changes: { itemId: string; change: number }[],
+      action: StockAction
+    ): string | null => {
+      const byId = new Map<string, number>();
+      for (const c of changes) {
+        byId.set(c.itemId, (byId.get(c.itemId) ?? 0) + c.change);
+      }
+
+      for (const [itemId, change] of byId) {
+        const item = items.find((i) => i.id === itemId);
+        if (!item) return "One or more products no longer exist.";
+        if (item.quantity + change < 0) {
+          return `Not enough stock for ${item.name} (${item.quantity} on hand).`;
+        }
+      }
+
+      const entries: ActivityEntry[] = [];
+      const nextItems = items.map((item) => {
+        const change = byId.get(item.id);
+        if (!change) return item;
+        const newQty = item.quantity + change;
+
+        entries.push({
+          id: crypto.randomUUID(),
+          itemId: item.id,
+          itemName: item.name,
+          sku: item.sku,
+          previousQty: item.quantity,
+          newQty,
+          change,
+          action,
+          userName: user?.name ?? "Unknown",
+          timestamp: new Date().toISOString(),
+        });
+
+        return withComputedStatus({
+          ...item,
+          quantity: newQty,
+          lastUpdated: new Date().toISOString().slice(0, 10),
+        });
+      });
+
+      if (entries.length === 0) return null;
+
+      setItems(nextItems);
+      setActivity((acts) => [...entries, ...acts].slice(0, 100));
+      return null;
     },
     [items, user?.name]
   );
@@ -314,6 +375,7 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
       categories,
       adjustStock,
       applyStockCounts,
+      applyStockChanges,
       addItem,
       updateItem,
       deleteItem,
@@ -326,6 +388,7 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
       categories,
       adjustStock,
       applyStockCounts,
+      applyStockChanges,
       addItem,
       updateItem,
       deleteItem,

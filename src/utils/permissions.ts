@@ -6,6 +6,8 @@ export interface Capabilities {
   canDeleteProducts: boolean;
   canManageSuppliers: boolean;
   canManagePurchaseOrders: boolean;
+  canManageSalesOrders: boolean;
+  canFulfillOrders: boolean;
   canResetData: boolean;
   canManageUsers: boolean;
 }
@@ -17,6 +19,8 @@ const ROLE_CAPABILITIES: Record<Role, Capabilities> = {
     canDeleteProducts: false,
     canManageSuppliers: false,
     canManagePurchaseOrders: false,
+    canManageSalesOrders: false,
+    canFulfillOrders: true,
     canResetData: false,
     canManageUsers: false,
   },
@@ -26,6 +30,8 @@ const ROLE_CAPABILITIES: Record<Role, Capabilities> = {
     canDeleteProducts: true,
     canManageSuppliers: true,
     canManagePurchaseOrders: true,
+    canManageSalesOrders: true,
+    canFulfillOrders: true,
     canResetData: false,
     canManageUsers: false,
   },
@@ -35,6 +41,8 @@ const ROLE_CAPABILITIES: Record<Role, Capabilities> = {
     canDeleteProducts: true,
     canManageSuppliers: true,
     canManagePurchaseOrders: true,
+    canManageSalesOrders: true,
+    canFulfillOrders: true,
     canResetData: true,
     canManageUsers: true,
   },
@@ -46,6 +54,8 @@ const NO_CAPABILITIES: Capabilities = {
   canDeleteProducts: false,
   canManageSuppliers: false,
   canManagePurchaseOrders: false,
+  canManageSalesOrders: false,
+  canFulfillOrders: false,
   canResetData: false,
   canManageUsers: false,
 };

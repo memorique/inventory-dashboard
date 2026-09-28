@@ -5,6 +5,7 @@ import InventoryTable from "../components/InventoryTable";
 import { usePermission } from "../context/AuthContext";
 import { useInventory } from "../context/InventoryContext";
 import { useProcurement } from "../context/ProcurementContext";
+import { useSales } from "../context/SalesContext";
 import type { StockStatus } from "../types/inventory";
 
 const statusFilters: { value: StockStatus | "all"; label: string }[] = [
@@ -17,6 +18,7 @@ const statusFilters: { value: StockStatus | "all"; label: string }[] = [
 export default function InventoryList() {
   const { items, adjustStock } = useInventory();
   const { onOrderByItem } = useProcurement();
+  const { reservedByItem } = useSales();
   const { canManageProducts } = usePermission();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<StockStatus | "all">("all");
@@ -122,6 +124,7 @@ export default function InventoryList() {
         editable={canManageProducts}
         onAdjust={adjustStock}
         onOrderByItem={onOrderByItem}
+        reservedByItem={reservedByItem}
       />
     </div>
   );

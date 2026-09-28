@@ -126,3 +126,31 @@ export interface PurchaseOrder {
   expectedAt: string | null;
   receivedAt: string | null;
 }
+
+export type SalesOrderStatus =
+  | "draft"
+  | "confirmed"
+  | "shipped"
+  | "cancelled";
+
+export interface SalesOrderLine {
+  itemId: string;
+  sku: string;
+  name: string;
+  quantity: number;
+  unitPrice: number;
+}
+
+export interface SalesOrder {
+  id: string;
+  orderNumber: string;
+  customerName: string;
+  customerEmail: string;
+  status: SalesOrderStatus;
+  lines: SalesOrderLine[];
+  notes: string;
+  createdAt: string;
+  confirmedAt: string | null;
+  shipBy: string | null;
+  shippedAt: string | null;
+}

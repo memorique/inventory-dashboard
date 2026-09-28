@@ -4,6 +4,7 @@ import type { ActivityEntry } from "../types/inventory";
 import { usePermission } from "../context/AuthContext";
 import { useInventory } from "../context/InventoryContext";
 import { useProcurement } from "../context/ProcurementContext";
+import { useSales } from "../context/SalesContext";
 
 const actionLabels: Record<ActivityEntry["action"], string> = {
   restock: "Restock",
@@ -72,17 +73,19 @@ function exportActivityCsv(activity: ActivityEntry[]) {
 export default function ActivityLog() {
   const { activity, resetInventory } = useInventory();
   const { resetProcurement } = useProcurement();
+  const { resetSales } = useSales();
   const { canResetData } = usePermission();
 
   function handleReset() {
     if (!canResetData) return;
     if (
       window.confirm(
-        "Reset all inventory, suppliers, and purchase orders to default sample data and clear activity?"
+        "Reset all inventory, suppliers, purchase orders, and sales orders to default sample data and clear activity?"
       )
     ) {
       resetInventory();
       resetProcurement();
+      resetSales();
     }
   }
 

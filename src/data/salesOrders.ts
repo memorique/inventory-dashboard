@@ -1,0 +1,81 @@
+import type { SalesOrder } from "../types/inventory";
+
+export const salesOrders: SalesOrder[] = [
+  {
+    id: "so-seed-1",
+    orderNumber: "SO-5001",
+    customerName: "Brightside Coworking",
+    customerEmail: "ops@brightside.co",
+    status: "shipped",
+    lines: [
+      {
+        itemId: "9",
+        sku: "SKU-5001",
+        name: "Notebook A5 — Ruled (Pack of 3)",
+        quantity: 40,
+        unitPrice: 9.99,
+      },
+    ],
+    notes: "Monthly stationery order.",
+    createdAt: "2026-05-20",
+    confirmedAt: "2026-05-20",
+    shipBy: "2026-05-24",
+    shippedAt: "2026-05-22",
+  },
+  {
+    id: "so-seed-2",
+    orderNumber: "SO-5002",
+    customerName: "Northwind Fitness",
+    customerEmail: "purchasing@northwindfit.com",
+    status: "confirmed",
+    lines: [
+      {
+        itemId: "7",
+        sku: "SKU-4001",
+        name: "Yoga Mat — Premium",
+        quantity: 20,
+        unitPrice: 42.0,
+      },
+      {
+        itemId: "5",
+        sku: "SKU-3001",
+        name: "Stainless Steel Water Bottle",
+        quantity: 24,
+        unitPrice: 18.75,
+      },
+    ],
+    notes: "Studio opening kit — bulk pricing on mats.",
+    createdAt: "2026-06-03",
+    confirmedAt: "2026-06-04",
+    shipBy: "2026-06-12",
+    shippedAt: null,
+  },
+  {
+    id: "so-seed-3",
+    orderNumber: "SO-5003",
+    customerName: "Lena Park",
+    customerEmail: "lena.park@example.com",
+    status: "draft",
+    lines: [
+      {
+        itemId: "3",
+        sku: "SKU-2001",
+        name: "Organic Cotton T-Shirt (M)",
+        quantity: 3,
+        unitPrice: 24.0,
+      },
+      {
+        itemId: "1",
+        sku: "SKU-1001",
+        name: "Wireless Bluetooth Headphones",
+        quantity: 1,
+        unitPrice: 79.99,
+      },
+    ],
+    notes: "",
+    createdAt: "2026-06-06",
+    confirmedAt: null,
+    shipBy: null,
+    shippedAt: null,
+  },
+];

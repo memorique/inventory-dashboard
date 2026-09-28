@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router";
-import { FiPlus, FiSearch } from "react-icons/fi";
+import { FiPlus, FiSearch, FiUpload } from "react-icons/fi";
 import InventoryTable from "../components/InventoryTable";
 import { usePermission } from "../context/AuthContext";
 import { useInventory } from "../context/InventoryContext";
@@ -53,13 +53,22 @@ export default function InventoryList() {
             edit icon to update
           </p>
         </div>
-        <Link
-          to="/dashboard/add-product"
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-brand-600 text-white text-sm font-medium hover:bg-brand-700 transition-colors shrink-0"
-        >
-          <FiPlus size={16} />
-          Add product
-        </Link>
+        <div className="flex items-center gap-3 shrink-0">
+          <Link
+            to="/dashboard/import-products"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+          >
+            <FiUpload size={16} />
+            Import CSV
+          </Link>
+          <Link
+            to="/dashboard/add-product"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-brand-600 text-white text-sm font-medium hover:bg-brand-700 transition-colors"
+          >
+            <FiPlus size={16} />
+            Add product
+          </Link>
+        </div>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-3">

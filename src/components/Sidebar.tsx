@@ -10,6 +10,7 @@ import {
   FiMapPin,
   FiCheckSquare,
   FiPackage,
+  FiRepeat,
   FiRotateCcw,
   FiShoppingBag,
   FiShoppingCart,
@@ -32,6 +33,7 @@ const navItems = [
   { to: "/dashboard/categories", label: "Categories", icon: FiLayers, end: false },
   { to: "/dashboard/locations", label: "Locations", icon: FiMapPin, end: false },
   { to: "/dashboard/stock-count", label: "Stock count", icon: FiCheckSquare, end: false },
+  { to: "/dashboard/transfers", label: "Transfers", icon: FiRepeat, end: false },
   { to: "/dashboard/activity", label: "Activity", icon: FiActivity, end: false },
 ];
 

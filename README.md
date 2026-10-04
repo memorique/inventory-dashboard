@@ -24,5 +24,6 @@ Open [http://localhost:5174](http://localhost:5174).
 - **Dashboard** — stats and low/out-of-stock items
 - **Inventory** — searchable table with filters
 - **Categories** — category summary cards
+- **Transfers** — move products between warehouses and bins
 
 Data lives in `src/data/dummyInventory.ts`.

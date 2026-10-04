@@ -11,6 +11,7 @@ import Categories from "./pages/Categories";
 import Locations from "./pages/Locations";
 import StockCount from "./pages/StockCount";
 import ActivityLog from "./pages/ActivityLog";
+import Transfers from "./pages/Transfers";
 import ReorderList from "./pages/ReorderList";
 import AddProduct from "./pages/AddProduct";
 import ImportProducts from "./pages/ImportProducts";
@@ -47,6 +48,14 @@ function App() {
         <Route path="categories" element={<Categories />} />
         <Route path="locations" element={<Locations />} />
         <Route path="stock-count" element={<StockCount />} />
+        <Route
+          path="transfers"
+          element={
+            <RequireCapability capability="canAdjustStock">
+              <Transfers />
+            </RequireCapability>
+          }
+        />
         <Route path="activity" element={<ActivityLog />} />
         <Route path="reorders" element={<ReorderList />} />
         <Route path="analytics" element={<Analytics />} />

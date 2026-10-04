@@ -16,6 +16,7 @@ const actionLabels: Record<ActivityEntry["action"], string> = {
   remove: "Deleted",
   receive: "PO received",
   return: "Customer return",
+  transfer: "Transfer",
 };
 
 const actionStyles: Record<ActivityEntry["action"], string> = {
@@ -27,6 +28,7 @@ const actionStyles: Record<ActivityEntry["action"], string> = {
   remove: "bg-rose-50 text-rose-700 border-rose-100",
   receive: "bg-brand-50 text-brand-700 border-brand-100",
   return: "bg-indigo-50 text-indigo-700 border-indigo-100",
+  transfer: "bg-cyan-50 text-cyan-700 border-cyan-100",
 };
 
 function formatTimestamp(iso: string) {
@@ -48,6 +50,8 @@ function exportActivityCsv(activity: ActivityEntry[]) {
     "New Qty",
     "Change",
     "User",
+    "From Location",
+    "To Location",
   ];
   const rows = activity.map((e) => [
     e.timestamp,
@@ -58,6 +62,8 @@ function exportActivityCsv(activity: ActivityEntry[]) {
     e.newQty,
     e.change,
     e.userName,
+    e.fromLocation ?? "",
+    e.toLocation ?? "",
   ]);
 
   const csv = [headers, ...rows]
@@ -168,6 +174,11 @@ export default function ActivityLog() {
                     <td className="px-4 py-3">
                       <p className="font-medium text-slate-900">{entry.itemName}</p>
                       <p className="text-xs text-slate-500 font-mono">{entry.sku}</p>
+                      {entry.action === "transfer" && entry.toLocation && (
+                        <p className="text-xs text-slate-500 mt-0.5">
+                          {entry.fromLocation} → {entry.toLocation}
+                        </p>
+                      )}
                     </td>
                     <td className="px-4 py-3">
                       <span
@@ -177,14 +188,18 @@ export default function ActivityLog() {
                       </span>
                     </td>
                     <td className="px-4 py-3 text-right tabular-nums font-medium">
-                      <span
-                        className={
-                          entry.change > 0 ? "text-teal-700" : "text-amber-700"
-                        }
-                      >
-                        {entry.change > 0 ? "+" : ""}
-                        {entry.change}
-                      </span>
+                      {entry.change === 0 ? (
+                        <span className="text-slate-400">—</span>
+                      ) : (
+                        <span
+                          className={
+                            entry.change > 0 ? "text-teal-700" : "text-amber-700"
+                          }
+                        >
+                          {entry.change > 0 ? "+" : ""}
+                          {entry.change}
+                        </span>
+                      )}
                     </td>
                     <td className="px-4 py-3 text-right tabular-nums text-slate-600">
                       {entry.previousQty} → {entry.newQty}

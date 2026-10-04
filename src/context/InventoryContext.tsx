@@ -37,6 +37,7 @@ interface InventoryContextValue {
     changes: { itemId: string; change: number }[],
     action: StockAction
   ) => string | null;
+  transferItems: (itemIds: string[], toLocation: string) => string | null;
   addItem: (item: NewInventoryItem) => string | null;
   updateItem: (itemId: string, item: NewInventoryItem) => string | null;
   deleteItem: (itemId: string) => string | null;
@@ -216,6 +217,58 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
     [items, user?.name]
   );
 
+  /**
+   * Moves the given items to a new location. Quantities are unchanged; each
+   * move is logged as a "transfer" with its source and destination.
+   */
+  const transferItems = useCallback(
+    (itemIds: string[], toLocation: string): string | null => {
+      const destination = toLocation.trim();
+      if (!destination) return "Please choose a destination location.";
+      if (itemIds.length === 0) return "Select at least one product to move.";
+
+      const ids = new Set(itemIds);
+      const moving = items.filter((i) => ids.has(i.id));
+      if (moving.length !== ids.size) {
+        return "One or more products no longer exist.";
+      }
+      if (moving.every((i) => i.location === destination)) {
+        return "Selected products are already at that location.";
+      }
+
+      const entries: ActivityEntry[] = [];
+      const nextItems = items.map((item) => {
+        if (!ids.has(item.id) || item.location === destination) return item;
+
+        entries.push({
+          id: crypto.randomUUID(),
+          itemId: item.id,
+          itemName: item.name,
+          sku: item.sku,
+          previousQty: item.quantity,
+          newQty: item.quantity,
+          change: 0,
+          action: "transfer",
+          userName: user?.name ?? "Unknown",
+          timestamp: new Date().toISOString(),
+          fromLocation: item.location,
+          toLocation: destination,
+        });
+
+        return {
+          ...item,
+          location: destination,
+          lastUpdated: new Date().toISOString().slice(0, 10),
+        };
+      });
+
+      setItems(nextItems);
+      setActivity((acts) => [...entries, ...acts].slice(0, 100));
+      return null;
+    },
+    [items, user?.name]
+  );
+
   const addItem = useCallback(
     (input: NewInventoryItem): string | null => {
       const sku = input.sku.trim().toUpperCase();
@@ -376,6 +429,7 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
       adjustStock,
       applyStockCounts,
       applyStockChanges,
+      transferItems,
       addItem,
       updateItem,
       deleteItem,
@@ -389,6 +443,7 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
       adjustStock,
       applyStockCounts,
       applyStockChanges,
+      transferItems,
       addItem,
       updateItem,
       deleteItem,

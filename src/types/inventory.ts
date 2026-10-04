@@ -8,7 +8,8 @@ export type StockAction =
   | "edit"
   | "remove"
   | "receive"
-  | "return";
+  | "return"
+  | "transfer";
 
 export interface NewInventoryItem {
   sku: string;
@@ -50,6 +51,8 @@ export interface ActivityEntry {
   action: StockAction;
   userName: string;
   timestamp: string;
+  fromLocation?: string;
+  toLocation?: string;
 }
 
 export interface ReorderSuggestion {

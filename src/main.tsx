@@ -5,6 +5,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { InventoryProvider } from "./context/InventoryContext";
 import { ProcurementProvider } from "./context/ProcurementContext";
 import { SalesProvider } from "./context/SalesContext";
+import { ReturnsProvider } from "./context/ReturnsContext";
 import App from "./App";
 import "./index.css";
 
@@ -15,7 +16,9 @@ createRoot(document.getElementById("root")!).render(
         <InventoryProvider>
           <ProcurementProvider>
             <SalesProvider>
-              <App />
+              <ReturnsProvider>
+                <App />
+              </ReturnsProvider>
             </SalesProvider>
           </ProcurementProvider>
         </InventoryProvider>

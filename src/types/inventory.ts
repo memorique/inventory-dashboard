@@ -7,7 +7,8 @@ export type StockAction =
   | "add"
   | "edit"
   | "remove"
-  | "receive";
+  | "receive"
+  | "return";
 
 export interface NewInventoryItem {
   sku: string;
@@ -153,4 +154,39 @@ export interface SalesOrder {
   confirmedAt: string | null;
   shipBy: string | null;
   shippedAt: string | null;
+}
+
+export type ReturnStatus = "requested" | "received" | "rejected";
+
+export type ReturnReason =
+  | "damaged"
+  | "defective"
+  | "wrong_item"
+  | "not_needed"
+  | "other";
+
+/** restock = back into sellable inventory; scrap = written off, no stock change. */
+export type ReturnDisposition = "restock" | "scrap";
+
+export interface ReturnLine {
+  itemId: string;
+  sku: string;
+  name: string;
+  quantity: number;
+  unitPrice: number;
+  disposition: ReturnDisposition;
+}
+
+export interface CustomerReturn {
+  id: string;
+  rmaNumber: string;
+  salesOrderId: string;
+  orderNumber: string;
+  customerName: string;
+  status: ReturnStatus;
+  reason: ReturnReason;
+  lines: ReturnLine[];
+  notes: string;
+  createdAt: string;
+  receivedAt: string | null;
 }

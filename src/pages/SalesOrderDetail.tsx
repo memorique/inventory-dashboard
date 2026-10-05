@@ -4,6 +4,7 @@ import {
   FiArrowLeft,
   FiCheckCircle,
   FiEdit2,
+  FiRotateCcw,
   FiSend,
   FiSlash,
   FiTrash2,
@@ -11,6 +12,7 @@ import {
 } from "react-icons/fi";
 import { usePermission } from "../context/AuthContext";
 import { useInventory } from "../context/InventoryContext";
+import { useReturns } from "../context/ReturnsContext";
 import { useSales } from "../context/SalesContext";
 import {
   getAvailableQty,
@@ -19,6 +21,13 @@ import {
   soStatusLabels,
   soStatusStyles,
 } from "../utils/sales";
+import {
+  getReturnTotal,
+  getReturnUnits,
+  hasReturnableUnits,
+  returnStatusLabels,
+  returnStatusStyles,
+} from "../utils/returns";
 
 function formatDate(iso: string | null) {
   if (!iso) return "—";
@@ -41,7 +50,9 @@ export default function SalesOrderDetail() {
     cancelSalesOrder,
     deleteSalesOrder,
   } = useSales();
-  const { canManageSalesOrders, canFulfillOrders } = usePermission();
+  const { returns } = useReturns();
+  const { canManageSalesOrders, canFulfillOrders, canManageReturns } =
+    usePermission();
   const [error, setError] = useState("");
 
   const so = salesOrders.find((s) => s.id === id);
@@ -63,6 +74,8 @@ export default function SalesOrderDetail() {
   const total = getSoTotal(so);
   const units = getSoUnits(so);
   const isOpen = so.status === "draft" || so.status === "confirmed";
+  const orderReturns = returns.filter((r) => r.salesOrderId === so.id);
+  const canStartReturn = hasReturnableUnits(so, returns);
 
   function handleConfirm() {
     if (!canManageSalesOrders) return;
@@ -204,7 +217,25 @@ export default function SalesOrderDetail() {
                 Cancel
               </button>
             )}
-            {so.status !== "confirmed" && (
+            {canStartReturn &&
+              (canManageReturns ? (
+                <Link
+                  to={`/dashboard/returns/new?order=${so.id}`}
+                  className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                >
+                  <FiRotateCcw size={15} />
+                  Create return
+                </Link>
+              ) : (
+                <span
+                  title="Managers and admins can create returns"
+                  className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm font-medium text-slate-700 opacity-40 cursor-not-allowed"
+                >
+                  <FiRotateCcw size={15} />
+                  Create return
+                </span>
+              ))}
+            {so.status !== "confirmed" && orderReturns.length === 0 && (
               <button
                 type="button"
                 onClick={handleDelete}
@@ -395,6 +426,40 @@ export default function SalesOrderDetail() {
               </dd>
             </div>
           </dl>
+
+          {orderReturns.length > 0 && (
+            <div className="mt-5 pt-5 border-t border-slate-100">
+              <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-900 mb-2">
+                <FiRotateCcw size={14} />
+                Returns
+              </h3>
+              <ul className="divide-y divide-slate-100">
+                {orderReturns.map((r) => (
+                  <li key={r.id}>
+                    <Link
+                      to={`/dashboard/returns/${r.id}`}
+                      className="flex items-center justify-between gap-2 py-2 group"
+                    >
+                      <div className="min-w-0">
+                        <p className="text-sm font-mono font-medium text-slate-900 group-hover:text-brand-700">
+                          {r.rmaNumber}
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          {getReturnUnits(r)} units · $
+                          {getReturnTotal(r).toFixed(2)}
+                        </p>
+                      </div>
+                      <span
+                        className={`inline-flex px-2 py-0.5 rounded-md text-[10px] font-medium border shrink-0 ${returnStatusStyles[r.status]}`}
+                      >
+                        {returnStatusLabels[r.status]}
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       </div>
     </div>

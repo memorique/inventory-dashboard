@@ -5,6 +5,7 @@ import { usePermission } from "../context/AuthContext";
 import { useInventory } from "../context/InventoryContext";
 import { useProcurement } from "../context/ProcurementContext";
 import { useSales } from "../context/SalesContext";
+import { useReturns } from "../context/ReturnsContext";
 
 const actionLabels: Record<ActivityEntry["action"], string> = {
   restock: "Restock",
@@ -14,6 +15,7 @@ const actionLabels: Record<ActivityEntry["action"], string> = {
   edit: "Edited",
   remove: "Deleted",
   receive: "PO received",
+  return: "Customer return",
 };
 
 const actionStyles: Record<ActivityEntry["action"], string> = {
@@ -24,6 +26,7 @@ const actionStyles: Record<ActivityEntry["action"], string> = {
   edit: "bg-sky-50 text-sky-700 border-sky-100",
   remove: "bg-rose-50 text-rose-700 border-rose-100",
   receive: "bg-brand-50 text-brand-700 border-brand-100",
+  return: "bg-indigo-50 text-indigo-700 border-indigo-100",
 };
 
 function formatTimestamp(iso: string) {
@@ -74,18 +77,20 @@ export default function ActivityLog() {
   const { activity, resetInventory } = useInventory();
   const { resetProcurement } = useProcurement();
   const { resetSales } = useSales();
+  const { resetReturns } = useReturns();
   const { canResetData } = usePermission();
 
   function handleReset() {
     if (!canResetData) return;
     if (
       window.confirm(
-        "Reset all inventory, suppliers, purchase orders, and sales orders to default sample data and clear activity?"
+        "Reset all inventory, suppliers, purchase orders, sales orders, and returns to default sample data and clear activity?"
       )
     ) {
       resetInventory();
       resetProcurement();
       resetSales();
+      resetReturns();
     }
   }
 

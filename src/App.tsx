@@ -23,6 +23,9 @@ import PurchaseOrderDetail from "./pages/PurchaseOrderDetail";
 import SalesOrders from "./pages/SalesOrders";
 import SalesOrderForm from "./pages/SalesOrderForm";
 import SalesOrderDetail from "./pages/SalesOrderDetail";
+import Returns from "./pages/Returns";
+import ReturnForm from "./pages/ReturnForm";
+import ReturnDetail from "./pages/ReturnDetail";
 import Users from "./pages/Users";
 
 function App() {
@@ -62,6 +65,9 @@ function App() {
         <Route path="sales-orders/new" element={<SalesOrderForm />} />
         <Route path="sales-orders/:id" element={<SalesOrderDetail />} />
         <Route path="sales-orders/:id/edit" element={<SalesOrderForm />} />
+        <Route path="returns" element={<Returns />} />
+        <Route path="returns/new" element={<ReturnForm />} />
+        <Route path="returns/:id" element={<ReturnDetail />} />
         <Route
           path="users"
           element={

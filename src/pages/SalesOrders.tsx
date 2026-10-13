@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Link } from "react-router";
+import { Link, useSearchParams } from "react-router";
 import {
   FiDollarSign,
   FiLock,
@@ -45,7 +45,8 @@ export default function SalesOrders() {
   const { salesOrders, stats } = useSales();
   const { canManageSalesOrders } = usePermission();
   const [filter, setFilter] = useState<SalesOrderStatus | "all">("all");
-  const [query, setQuery] = useState("");
+  const [searchParams] = useSearchParams();
+  const [query, setQuery] = useState(() => searchParams.get("q") ?? "");
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();

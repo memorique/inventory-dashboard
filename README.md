@@ -25,5 +25,6 @@ Open [http://localhost:5174](http://localhost:5174).
 - **Inventory** — searchable table with filters
 - **Categories** — category summary cards
 - **Transfers** — move products between warehouses and bins
+- **Customers** — customer directory with order counts and revenue, built from sales orders
 
 Data lives in `src/data/dummyInventory.ts`.

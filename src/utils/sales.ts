@@ -112,3 +112,56 @@ export const soStatusStyles: Record<SalesOrder["status"], string> = {
   shipped: "bg-emerald-50 text-emerald-700 border-emerald-200",
   cancelled: "bg-rose-50 text-rose-700 border-rose-200",
 };
+
+export interface CustomerSummary {
+  name: string;
+  email: string;
+  orderCount: number;
+  openCount: number;
+  shippedValue: number;
+  openValue: number;
+  lastOrderAt: string;
+}
+
+/**
+ * Groups sales orders into customers, keyed by email (or name when the email
+ * is blank). Cancelled orders count toward the order total but not revenue.
+ */
+export function getCustomerSummaries(
+  salesOrders: SalesOrder[]
+): CustomerSummary[] {
+  const map = new Map<string, CustomerSummary>();
+
+  for (const so of salesOrders) {
+    const key = (so.customerEmail.trim() || so.customerName.trim()).toLowerCase();
+    let customer = map.get(key);
+    if (!customer) {
+      customer = {
+        name: so.customerName,
+        email: so.customerEmail,
+        orderCount: 0,
+        openCount: 0,
+        shippedValue: 0,
+        openValue: 0,
+        lastOrderAt: so.createdAt,
+      };
+      map.set(key, customer);
+    }
+
+    customer.orderCount += 1;
+    if (so.status === "shipped") {
+      customer.shippedValue += getSoTotal(so);
+    } else if (so.status === "draft" || so.status === "confirmed") {
+      customer.openCount += 1;
+      customer.openValue += getSoTotal(so);
+    }
+    if (so.createdAt >= customer.lastOrderAt) {
+      customer.lastOrderAt = so.createdAt;
+      customer.name = so.customerName;
+    }
+  }
+
+  return Array.from(map.values()).sort(
+    (a, b) => b.shippedValue - a.shippedValue || a.name.localeCompare(b.name)
+  );
+}

@@ -27,6 +27,7 @@ import SalesOrderDetail from "./pages/SalesOrderDetail";
 import Returns from "./pages/Returns";
 import ReturnForm from "./pages/ReturnForm";
 import ReturnDetail from "./pages/ReturnDetail";
+import Customers from "./pages/Customers";
 import Users from "./pages/Users";
 
 function App() {
@@ -77,6 +78,7 @@ function App() {
         <Route path="returns" element={<Returns />} />
         <Route path="returns/new" element={<ReturnForm />} />
         <Route path="returns/:id" element={<ReturnDetail />} />
+        <Route path="customers" element={<Customers />} />
         <Route
           path="users"
           element={

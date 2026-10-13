@@ -16,6 +16,7 @@ import {
   FiShoppingCart,
   FiTrendingUp,
   FiTruck,
+  FiUser,
   FiUsers,
 } from "react-icons/fi";
 import { useAuth, usePermission } from "../context/AuthContext";
@@ -29,6 +30,7 @@ const navItems = [
   { to: "/dashboard/purchase-orders", label: "Purchase orders", icon: FiClipboard, end: false },
   { to: "/dashboard/sales-orders", label: "Sales orders", icon: FiShoppingBag, end: false },
   { to: "/dashboard/returns", label: "Returns", icon: FiRotateCcw, end: false },
+  { to: "/dashboard/customers", label: "Customers", icon: FiUser, end: false },
   { to: "/dashboard/analytics", label: "Analytics", icon: FiTrendingUp, end: false },
   { to: "/dashboard/categories", label: "Categories", icon: FiLayers, end: false },
   { to: "/dashboard/locations", label: "Locations", icon: FiMapPin, end: false },

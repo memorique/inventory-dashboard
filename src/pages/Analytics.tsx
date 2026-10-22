@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import { FiTrendingUp } from "react-icons/fi";
+import { useSearchParams } from "react-router";
 import StockChart from "../components/StockChart";
 import { useInventory } from "../context/InventoryContext";
 import type { StockEvent, StockEventType } from "../types/inventory";
@@ -30,7 +31,10 @@ function formatEventDate(iso: string) {
 
 export default function Analytics() {
   const { items } = useInventory();
-  const [selectedId, setSelectedId] = useState(items[0]?.id ?? "");
+  const [searchParams] = useSearchParams();
+  const [selectedId, setSelectedId] = useState(
+    () => searchParams.get("item") ?? items[0]?.id ?? ""
+  );
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
   const eventRefs = useRef<Map<string, HTMLDivElement>>(new Map());
 

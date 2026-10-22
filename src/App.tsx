@@ -16,6 +16,7 @@ import ReorderList from "./pages/ReorderList";
 import AddProduct from "./pages/AddProduct";
 import ImportProducts from "./pages/ImportProducts";
 import EditProduct from "./pages/EditProduct";
+import ProductDetail from "./pages/ProductDetail";
 import Analytics from "./pages/Analytics";
 import Suppliers from "./pages/Suppliers";
 import PurchaseOrders from "./pages/PurchaseOrders";
@@ -62,6 +63,7 @@ function App() {
         <Route path="analytics" element={<Analytics />} />
         <Route path="add-product" element={<AddProduct />} />
         <Route path="import-products" element={<ImportProducts />} />
+        <Route path="inventory/:id" element={<ProductDetail />} />
         <Route path="inventory/:id/edit" element={<EditProduct />} />
         <Route path="suppliers" element={<Suppliers />} />
         <Route path="purchase-orders" element={<PurchaseOrders />} />

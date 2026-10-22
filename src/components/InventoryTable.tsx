@@ -56,16 +56,12 @@ export default function InventoryTable({
                   {item.sku}
                 </td>
                 <td className="px-4 py-3 font-medium text-slate-900">
-                  {editable ? (
-                    <Link
-                      to={`/dashboard/inventory/${item.id}/edit`}
-                      className="hover:text-brand-700 transition-colors"
-                    >
-                      {item.name}
-                    </Link>
-                  ) : (
-                    item.name
-                  )}
+                  <Link
+                    to={`/dashboard/inventory/${item.id}`}
+                    className="hover:text-brand-700 transition-colors"
+                  >
+                    {item.name}
+                  </Link>
                 </td>
                 <td className="px-4 py-3 text-slate-600">{item.category}</td>
                 <td className="px-4 py-3 text-right tabular-nums font-medium">

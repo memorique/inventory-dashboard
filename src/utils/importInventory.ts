@@ -126,3 +126,46 @@ export function buildTemplateCsv(): string {
   ];
   return toCsv([header, example]);
 }
+
+/**
+ * Exports items using the import column names first, so the file can be
+ * re-imported elsewhere. Extra columns after those are ignored on import.
+ */
+export function buildInventoryCsv(
+  items: InventoryItem[],
+  reservedByItem: Record<string, number>,
+  onOrderByItem: Record<string, number>
+): string {
+  const header = [
+    "sku",
+    "name",
+    "category",
+    "quantity",
+    "reorderLevel",
+    "unitPrice",
+    "location",
+    "status",
+    "reserved",
+    "available",
+    "onOrder",
+    "lastUpdated",
+  ];
+  const rows = items.map((item) => {
+    const reserved = reservedByItem[item.id] ?? 0;
+    return [
+      item.sku,
+      item.name,
+      item.category,
+      item.quantity,
+      item.reorderLevel,
+      item.unitPrice.toFixed(2),
+      item.location,
+      item.status,
+      reserved,
+      Math.max(0, item.quantity - reserved),
+      onOrderByItem[item.id] ?? 0,
+      item.lastUpdated,
+    ];
+  });
+  return toCsv([header, ...rows]);
+}

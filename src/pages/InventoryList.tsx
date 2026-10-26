@@ -1,12 +1,13 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router";
-import { FiPlus, FiSearch, FiUpload } from "react-icons/fi";
+import { FiDownload, FiPlus, FiSearch, FiUpload } from "react-icons/fi";
 import InventoryTable from "../components/InventoryTable";
 import { usePermission } from "../context/AuthContext";
 import { useInventory } from "../context/InventoryContext";
 import { useProcurement } from "../context/ProcurementContext";
 import { useSales } from "../context/SalesContext";
 import type { StockStatus } from "../types/inventory";
+import { buildInventoryCsv } from "../utils/importInventory";
 
 const statusFilters: { value: StockStatus | "all"; label: string }[] = [
   { value: "all", label: "All" },
@@ -45,17 +46,42 @@ export default function InventoryList() {
     });
   }, [items, search, statusFilter, categoryFilter]);
 
+  function handleExport() {
+    const csv = buildInventoryCsv(filtered, reservedByItem, onOrderByItem);
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `inventory-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Inventory</h1>
           <p className="text-sm text-slate-500 mt-1">
-            {filtered.length} of {items.length} items · click a product name or
-            edit icon to update
+            {filtered.length} of {items.length} items · click a product name for
+            details or the edit icon to update
           </p>
         </div>
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex flex-wrap items-center gap-3 shrink-0">
+          <button
+            type="button"
+            onClick={handleExport}
+            disabled={filtered.length === 0}
+            title={
+              filtered.length === items.length
+                ? "Export all products"
+                : `Export the ${filtered.length} filtered products`
+            }
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            <FiDownload size={16} />
+            Export CSV
+          </button>
           <Link
             to="/dashboard/import-products"
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
